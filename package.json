@@ -1,0 +1,23 @@
+{
+  "name": "green-cart",
+  "version": "1.0.0",
+  "description": "Prototype of our project.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanishsairohit/GreenCart.git"
+  },
+  "keywords": [
+    "Master",
+    "Prototype"
+  ],
+  "author": "Group 8",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hanishsairohit/GreenCart/issues"
+  },
+  "homepage": "https://github.com/hanishsairohit/GreenCart#readme"
+}
