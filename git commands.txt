@@ -1,0 +1,18 @@
+ COMMANDS for Git.
+
+
+
+1. git status
+/* Status and list about the branch and other informations-- Highly usefull command */
+
+2. hit add .
+/* To add the file in the staging area */
+
+3. git commit -m "commit message"
+/* commit the changes to the repository */
+
+4. git checkout -b new-branch-name
+/* "-b" stands for new branch,  checkout is used for switch to new branch */ 
+
+5. git checkout beanch-name
+/* to switch the branch */
