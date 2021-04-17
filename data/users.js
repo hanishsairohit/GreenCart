@@ -117,7 +117,16 @@ module.exports = {
     const userData = await users();
     const userById = await userData.findOne({ _id: newId });
     if (userById === null) throw "No user found :- getUser()";
-    userById["_id"] = userById["_id"].toString();
+    userById["_id"] = userById["  _id"].toString();
     return userById;
+  },
+  async getAllUsers() {
+    const allUsers = await users();
+    const usersCollection = await allUsers.find({}).toArray();
+    if (usersCollection.length === 0 || usersCollection.length === undefined) {
+      return "Users Data is empty. :- getAllUsers()";
+    } else {
+      return usersCollection;
+    }
   },
 };
