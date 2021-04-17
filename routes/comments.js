@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const data = require('../data');
 const commentData = data.comments;
-const projectData = data.projects;
+const productData = data.products;
 const userData = data.users;
 const { ObjectId } = require('mongodb');
 
