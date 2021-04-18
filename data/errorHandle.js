@@ -21,10 +21,47 @@ function ageValid(age) {
   else return true;
 }
 
+//Phine number Validation
+// Valid formats:
+
+// (123) 456-7890
+// (123)456-7890
+// 123-456-7890
+// 123.456.7890
+// 1234567890
+// +31636363634
+// 075-63546725
+function phoneNumberValid(number) {
+  if (!number) return false;
+  const numberRe = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/gim;
+  return numberRe.test(toString(number));
+}
+
+//zip code validation
+function zipcCodeValid(code) {
+  if (!code) return false;
+  const codeRe = /^[0-9]{5}(?:-[0-9]{4})?$/gim;
+  return codeRe.test(toString(code));
+}
+//The length of password should be greater than or equal to 8 characters
+function validPassword(password) {
+  if (!password || typeof password !== "string" || password.trim().length < 8) {
+    return false;
+  } else return true;
+}
+
 // function to convert mongo generated Object id to string id and return that object
 function stringId(data) {
   data._id = data._id.toString();
   return data;
 }
 
-module.exports = { stringCheck, emailValidate, ageValid, stringId };
+module.exports = {
+  stringCheck,
+  emailValidate,
+  ageValid,
+  stringId,
+  validPassword,
+  phoneNumberValid,
+  zipcCodeValid,
+};

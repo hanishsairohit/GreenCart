@@ -21,12 +21,16 @@ parameters:-
 const mongoCollections = require("../config/mongoCollections");
 const users = mongoCollections.users;
 let { ObjectId } = require("mongodb");
+const errorHandle = require("./errorHandle");
+const bcrypt = require("bcryptjs");
+let saltNumber = 14;
 
 module.exports = {
   async addUser(
     firstName,
     lastName,
     dateOfBirth,
+
     age,
     phoneNumber,
     emailId,
@@ -36,35 +40,20 @@ module.exports = {
     reviewsId
   ) {
     // Error handling and Checking
-    if (
-      !firstName ||
-      !lastName ||
-      !dateOfBirth ||
-      !age ||
-      !phoneNumber ||
-      !emailId ||
-      !password ||
-      !address ||
-      !profilePhoto ||
-      !reviewsId
-    )
-      throw "All fields Must be provided :- addUser()";
-    if (
-      typeof firstName !== "string" ||
-      firstName.trim().length == 0 ||
-      typeof lastName !== "string" ||
-      lastName.trim().length == 0 ||
-      typeof dateOfBirth !== "string" ||
-      dateOfBirth.trim().length == 0 ||
-      typeof age !== "number" ||
-      age.trim().length == 0 ||
-      typeof phoneNumber !== "number" ||
-      phoneNumber.trim().length == 0 ||
-      typeof emailId !== "string" ||
-      emailId.trim().length == 0
-    )
-      throw "Either provided data is not of proper type or the length of the data is zero :- addUser()";
 
+    if (!errorHandle.stringCheck(firstName))
+      throw "Provided first name is not proper!";
+    if (!errorHandle.stringCheck(lastName))
+      throw "Provided last name is not proper!";
+    if (!errorHandle.emailValidate(emailId))
+      throw " Provided emailId is not valid!";
+    if (!errorHandle.validPassword(password))
+      throw " Provided password is not valid!";
+    if (!errorHandle.phoneNumberValid(phoneNumber))
+      throw "Provided phone number is not valid";
+    if (!errorHandle.ageValid(age)) throw "Age is not valid!";
+
+    //
     if (typeof address !== "object")
       throw "Address should be the type of object :-addUser()";
 
@@ -73,19 +62,24 @@ module.exports = {
     state = address.state;
     code = address.code;
 
-    if (
-      typeof state !== "string" ||
-      state.trim().length == 0 ||
-      typeof city !== "string" ||
-      city.trim().length == 0 ||
-      typeof street !== "string" ||
-      street.trim().length == 0 ||
-      typeof code !== "string" ||
-      code.trim().length == 0
-    )
-      throw " The provided address info is not of proper type or empty :-addUser()";
+    if (!errorHandle.stringCheck(street)) throw "Street name is not valid!";
+    if (!errorHandle.stringCheck(city)) throw "City name is not valid!";
+    if (!errorHandle.stringCheck(state)) throw "State name is not valid!";
+    if (!errorHandle.zipcCodeValid(code)) throw "Zip code is not valid!";
+    // Checking if the email/userName is already used;
+    const allUser = await this.getAllUsers();
+    // converting email into lower case
+    let propEmail = emailId.toLowerCase();
+    allUser.forEach((element) => {
+      if (element.emailId == propEmail)
+        throw "Sorr but email is already in use";
+    });
+
     ////////////////
-    const addUser = await users();
+    //Encrypt the password
+    const hasedPassword = await bcrypt.hash(password, saltNumber);
+    ////////////////
+
     // storing the data into an object
     let newUser = {
       firstName: firstName,
@@ -93,23 +87,23 @@ module.exports = {
       dateOfBirth: dateOfBirth,
       age: age,
       phoneNumber: phoneNumber,
-      emailId: emailId,
-      password: password,
+      emailId: propEmail,
+      password: hasedPassword,
       address: {
         street: street,
         city: city,
         state: state,
         code: code,
       },
-      profilePhoto: "path or url",
+      profilePhoto: profilePhoto,
       reviewsId: [],
     };
-
+    const addUser = await users();
     const insertedUser = await addUser.insertOne(newUser);
     if (insertedUser.insertedCount === 0)
       throw "Could not add User. :-addUser()";
     const newUserId = await insertedUser.insertedId;
-    const addedUser = await this.getUser(newUserId);
+    const addedUser = await this.getUser(newUserId.toString());
     return addedUser;
   },
   async getUser(userId) {

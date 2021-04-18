@@ -5,7 +5,7 @@
 1. git status
 /* Status and list about the branch and other informations-- Highly usefull command */
 
-2. hit add .
+2. goriginit add .
 /* To add the file in the staging area */
 
 3. git commit -m "commit message"
@@ -16,3 +16,6 @@
 
 5. git checkout beanch-name
 /* to switch the branch */
+
+6. git pull origin branch-name
+/* pull request from particular branch */
