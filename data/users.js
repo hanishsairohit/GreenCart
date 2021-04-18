@@ -107,7 +107,9 @@ module.exports = {
     return addedUser;
   },
   async getUser(userId) {
-    newId = ObjectId(userId);
+    if (!errorHandle.stringId(userId)) throw "Id is not valid string!";
+
+    newId = ObjectId(userId.trim());
     const userData = await users();
     const userById = await userData.findOne({ _id: newId });
     if (userById === null) throw "No user found :- getUser()";
@@ -120,6 +122,9 @@ module.exports = {
     if (usersCollection.length === 0 || usersCollection.length === undefined) {
       return "Users Data is empty. :- getAllUsers()";
     } else {
+      for (let i of usersCollection) {
+        i._id = i._id.toString();
+      }
       return usersCollection;
     }
   },
