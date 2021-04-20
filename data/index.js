@@ -1,3 +1,4 @@
+const products = require("./products");
 const users = require("./users");
 const comments = require("./comments");
 
