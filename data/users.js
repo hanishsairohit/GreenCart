@@ -29,7 +29,6 @@ module.exports = {
   async addUser(
     firstName,
     lastName,
-    dateOfBirth,
 
     age,
     phoneNumber,
@@ -84,7 +83,7 @@ module.exports = {
     let newUser = {
       firstName: firstName,
       lastName: lastName,
-      dateOfBirth: dateOfBirth,
+
       age: age,
       phoneNumber: phoneNumber,
       emailId: propEmail,
