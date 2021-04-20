@@ -1,5 +1,9 @@
-const productsData = require("./products");
+const products = require("./products");
+const users = require("./users");
+const comments = require("./comments");
+
 module.exports = {
-    products: productsData
-   
+  users,
+  comments,
+  products,
 };
