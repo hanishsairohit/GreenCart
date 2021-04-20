@@ -52,7 +52,7 @@ function validPassword(password) {
 
 // function to convert mongo generated Object id to string id and return that object
 function stringId(data) {
-  data._id = data._id.toString();
+  data._id = data._id.toString(); 
   return data;
 }
 
