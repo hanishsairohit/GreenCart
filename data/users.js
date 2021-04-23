@@ -36,8 +36,7 @@ module.exports = {
     emailId,
     password,
     address,
-    profilePhoto,
-    reviewsId
+    profilePhoto
   ) {
     // Error handling and Checking
 
@@ -45,12 +44,12 @@ module.exports = {
       throw "Provided first name is not proper!";
     if (!errorHandle.stringCheck(lastName))
       throw "Provided last name is not proper!";
-    if (!errorHandle.emailValidate(emailId))
-      throw " Provided emailId is not valid!";
+    // if (!errorHandle.emailValidate(emailId))
+    //   throw " Provided emailId is not valid!";
     if (!errorHandle.validPassword(password))
       throw " Provided password is not valid!";
-    if (!errorHandle.phoneNumberValid(phoneNumber))
-      throw "Provided phone number is not valid";
+    // if (!errorHandle.phoneNumberValid(phoneNumber))
+    //   throw "Provided phone number is not valid";
     if (!errorHandle.ageValid(age)) throw "Age is not valid!";
 
     //
@@ -65,15 +64,15 @@ module.exports = {
     if (!errorHandle.stringCheck(street)) throw "Street name is not valid!";
     if (!errorHandle.stringCheck(city)) throw "City name is not valid!";
     if (!errorHandle.stringCheck(state)) throw "State name is not valid!";
-    if (!errorHandle.zipcCodeValid(code)) throw "Zip code is not valid!";
+    // if (!errorHandle.zipcCodeValid(code)) throw "Zip code is not valid!";
     // Checking if the email/userName is already used;
-    const allUser = await this.getAllUsers();
-    // converting email into lower case
+    // const allUser = await this.getAllUsers();
+    // // converting email into lower case
     let propEmail = emailId.toLowerCase();
-    allUser.forEach((element) => {
-      if (element.emailId == propEmail)
-        throw "Sorr but email is already in use";
-    });
+    // allUser.forEach((element) => {
+    //   if (element.emailId == propEmail)
+    //     throw "Sorry but email is already in use";
+    // });
 
     ////////////////
     //Encrypt the password
@@ -102,8 +101,8 @@ module.exports = {
     const insertedUser = await addUser.insertOne(newUser);
     if (insertedUser.insertedCount === 0)
       throw "Could not add User. :-addUser()";
-    const newUserId = await insertedUser.insertedId;
-    const addedUser = await this.getUser(newUserId.toString());
+    const newUserId = await insertedUser.insertedId.toString();
+    const addedUser = await this.getUser(newUserId);
     return addedUser;
   },
   async getUser(userId) {
@@ -113,7 +112,7 @@ module.exports = {
     const userData = await users();
     const userById = await userData.findOne({ _id: newId });
     if (userById === null) throw "No user found :- getUser()";
-    userById["_id"] = userById["  _id"].toString();
+    userById["_id"] = userById["_id"].toString();
     return userById;
   },
   async getAllUsers() {

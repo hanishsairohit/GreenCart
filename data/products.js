@@ -1,32 +1,62 @@
-const mongoCollections = require('../config/mongoCollections');
+const mongoCollections = require("../config/mongoCollections");
 const products = mongoCollections.products;
-const uuid = require('uuid').v4;
+const commentsData = require("./index").comments;
+const uuid = require("uuid").v4;
 
 let exportedMethods = {
   async getAllProducts() {
     const productCollection = await products();
     const productList = await productCollection.find({}).toArray();
-    if (!productList) throw 'No Book in system!';
-    const result = []
+    if (!productList) throw "No Book in system!";
+    const result = [];
     for (let product of productList) {
-      const { _id, title, description, productImage, noOfLikes, comments, likedBy, createdBy, createdAt } = product;
-      result.push({ _id, title, description, productImage, noOfLikes, comments, likedBy, createdBy, createdAt })
+      const {
+        _id,
+        title,
+        description,
+        productImage,
+        noOfLikes,
+        comments,
+        likedBy,
+        createdBy,
+        createdAt,
+      } = product;
+      result.push({
+        _id,
+        title,
+        description,
+        productImage,
+        noOfLikes,
+        comments,
+        likedBy,
+        createdBy,
+        createdAt,
+      });
     }
     return result;
   },
 
   async getProductById(id) {
     const productCollection = await products();
-    ObjectId = require('mongodb').ObjectID;
+    ObjectId = require("mongodb").ObjectID;
     if (!id) {
-      throw "You must insert id"
+      throw "You must insert id";
     }
     const product = await productCollection.findOne({ _id: ObjectId(id) });
-    if (!product) throw 'product not found';
+    if (!product) throw "product not found";
     return product;
   },
 
-  async addProducts(title, description, productImage, noOfLikes, comments, likedBy, createdBy, createdAt) {
+  async addProducts(
+    title,
+    description,
+    productImage,
+    noOfLikes,
+    comments,
+    likedBy,
+    createdBy,
+    createdAt
+  ) {
     const productCollection = await products();
     let newProduct = {
       title: title,
@@ -36,15 +66,25 @@ let exportedMethods = {
       comments: comments,
       likedBy: likedBy,
       createdBy: createdBy,
-      createdAt: createdAt
+      createdAt: createdAt,
     };
     const newInsertInformation = await productCollection.insertOne(newProduct);
-    if (newInsertInformation.insertedCount === 0) throw 'Insert failed!';
-    ObjectId = require('mongodb').ObjectID;
-    return await productCollection.findOne({ _id: ObjectId(newInsertInformation.insertedId) });
+    if (newInsertInformation.insertedCount === 0) throw "Insert failed!";
+    ObjectId = require("mongodb").ObjectID;
+    return await productCollection.findOne({
+      _id: ObjectId(newInsertInformation.insertedId),
+    });
   },
 
+  async getCommentsOfProduct(productID) {
+    const products = this.getProductById(productID);
 
+    const comments = [];
+    for (comment of products.comments) {
+      comments.push([commentsData.getComment(comment)]);
+    }
+    return comments;
+  },
 };
 
 module.exports = exportedMethods;

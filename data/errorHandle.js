@@ -1,16 +1,18 @@
 //Function for checking the string.
 
 function stringCheck(str) {
-  (!str || typeof str !== "string" || str.trim().length == 0) ?false:true;
-
+  return !str || typeof str !== "string" || str.trim().length == 0
+    ? false
+    : true;
 }
 
 //email validation functions
 // return boolean
 function emailValidate(email) {
-  
+  console.log(email);
   if (!email) return false;
   const emailRe = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  console.log(emailRe.test(toString(email).toLowerCase()));
   return emailRe.test(toString(email).toLowerCase());
 }
 
@@ -24,7 +26,6 @@ function ageValid(age) {
 
 //Phine number Validation
 // Valid formats:
-
 // (123) 456-7890
 // (123)456-7890
 // 123-456-7890
@@ -53,7 +54,7 @@ function validPassword(password) {
 
 // function to convert mongo generated Object id to string id and return that object
 function stringId(data) {
-  data._id = data._id.toString(); 
+  data = data.toString();
   return data;
 }
 
