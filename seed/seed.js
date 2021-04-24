@@ -1,15 +1,135 @@
-const dbConnection = require('../config/mongoConnection');
-const data = require('../data/');
+const dbConnection = require("../config/mongoConnection");
+const data = require("../data/index");
 const products = data.products;
-// const uuid = require('uuid').v4;
+const comments = data.comments;
+const users = data.users;
+
+const { ObjectId } = require("mongodb");
+const { use } = require("../routes/users");
+address = {
+  street: "abcde",
+  city: "NYC",
+  state: "NY",
+  code: "07307",
+};
 
 async function main() {
   const db = await dbConnection();
   await db.dropDatabase();
-  await products.addProducts('Water Lilly','It is one of the most majestic plants to have in a water garden. It is by far the most exotic of all pond plants.Best grown in moist, acidic, humusy soils in part shade to full shade. Plants may be grown from seed, but will not flower for 4-5 years. Quicker and better results are obtained from planting corms which are sold by many bulb suppliers and nurseries.In addition, offsets from mature plants may be harvested and planted.','https://cdn3.volusion.com/zmypa.bvvnu/v/vspfiles/photos/WA27539PL-2.jpg','5','good to buy','15','null','null');
-  await products.addProducts('Gulmohar Tree, Delonix regia', 'Enhance the beauty of your outdoor garden with an amazing flowering Gulmohar as avenue plant.Delonix regia is branched, broad, spreading, flat crowned deciduous tree. The attractive, semi deciduous leaves are elegant and fern like. Long, dark brown seed pods hang on the tree throughout the winter.The flowers of Delonix are large, with four spreading scarlet or orange-red petals and a fifth upright petal called the standard petal.','https://i.pinimg.com/originals/da/33/bf/da33bf18c254ea101672892c612679fb.jpg','58','Awesome plant','105','null','null');
+  const product1 = await products.addProduct(
+    "Water Lilly",
+    "It is one of the most majestic plants to have in a water garden. It is by far the most exotic of all pond plants.Best grown in moist, acidic, humusy soils in part shade to full shade. Plants may be grown from seed, but will not flower for 4-5 years. Quicker and better results are obtained from planting corms which are sold by many bulb suppliers and nurseries.In addition, offsets from mature plants may be harvested and planted.",
+    "https://cdn3.volusion.com/zmypa.bvvnu/v/vspfiles/photos/WA27539PL-2.jpg",
+    "seed.js",
+    34,
+    [
+      { property: "product_type", value: "plant" },
+      { property: "color", value: "green" },
+      { property: "weight", value: 55 },
+    ]
+  );
 
-   console.log('Done seeding database');
+  const product2 = await products.addProduct(
+    "China seeds",
+    "seeds are from china",
+    "https://i.pinimg.com/originals/da/33/bf/da33bf18c254ea101672892c612679fb.jpg",
+    "seed.js",
+    10,
+    [
+      { property: "product_type", value: "seed" },
+      { property: "color", value: "brown" },
+      { property: "number_of_seeds", value: 45 },
+    ]
+  );
+
+  //firstName, lastName, phoneNumber, emailId, password, address
+  const user1 = await users.addUser(
+    "Hanish",
+    "Pallapothu",
+    9293258425,
+    "hanishrohit@gmail.com",
+    "hanishPassword",
+    {
+      Line1: "332 Webster Ave",
+      Line2: "Apt #2L",
+      City: "Jersey City",
+      State: "New Jersey",
+      Country: "USA",
+      ZipCode: 07307,
+    }
+  );
+  const user2 = await users.addUser(
+    "Dhruv",
+    "D",
+    "02/02/1997",
+    23,
+    "9293258420",
+    "Dhriv@gmail.com",
+    "DhruvDhruv",
+    {
+      Line1: "332 Webster Ave",
+      Line2: "Apt #2R",
+      City: "Jersey City",
+      State: "New Jersey",
+      Country: "USA",
+      ZipCode: 07307,
+    }
+  );
+
+  //608359c8aa00751b1ebd7546
+  const c1 = await comments.addComment(
+    user1._id,
+    product1,
+    "This plant is so good."
+  );
+  const c2 = await comments.addComment(
+    user2._id,
+    product1,
+    "This plant is so nice."
+  );
+  const c3 = await comments.addComment(
+    user1._id,
+    product2,
+    "This plant is not good."
+  );
+  const c4 = await comments.addComment(
+    user2._id,
+    product2,
+    "I wont recommend."
+  );
+
+  const c1Info = await comments.getComment(c1);
+  //   console.log(c1Info);
+
+  console.log("Done seeding database");
+
+  //   await products.addLike(product1, user1._id);
+
+  // below code is for testing database functions.
+
+  //   const productsInfp = await products.getAllProducts();
+  const userData = await users.getUser(user1._id);
+  const produtInf = await products.getProductById(product1);
+
+  //   const productsList1 = await products.searchProduct("harvested");
+
+  const prop = { color: "green", product_type: "plant" };
+
+  const productsList1 = await products.filterProducts(prop);
+
+  console.log(productsList1);
+
+  //   const productsList = await users.getUserLikedProdcuts(user1._id);
+  //   console.log(productsList);
+
+  //   console.log(userData);
+
+  //   const commentsOfprp = await products.getProductComments(product1);
+  //   console.log("Ddd");
+  //   console.log(commentsOfprp);
+  //   const commentsOfuser = await users.getUserComments(user1._id);
+
+  //   console.log(produtInf);
 
   await db.serverConfig.close();
 }
