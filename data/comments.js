@@ -2,7 +2,6 @@ const mongoCollections = require("../config/mongoCollections");
 const comments = mongoCollections.comments;
 const productsData = require("./products");
 const usersData = require("./users");
-
 const { ObjectId } = require("mongodb");
 
 async function addComment(userId, productId, commentText) {

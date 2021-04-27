@@ -50,7 +50,6 @@ router.post('/products', async (req, res) => {
     res.status(500).json({ error: "Product was not added" });
   }
 
-
 });
 
 module.exports = router;

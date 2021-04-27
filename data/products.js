@@ -21,6 +21,7 @@ let exportedMethods = {
         productImage,
         noOfLikes,
         createdAt,
+        stock,
         facet,
       } = product;
       _id = _id.toString();
@@ -31,6 +32,7 @@ let exportedMethods = {
         productImage,
         noOfLikes,
         createdAt,
+        stock,
         facet,
       });
     }
@@ -195,9 +197,69 @@ let exportedMethods = {
     return productsList;
   },
 
-  // will implement later
-  async sortProducts(sortby) {
-    return await this.getAllProducts();
+  async sortProducts(sortby, pageNo) {
+    const productsCollection = await products();
+
+    if (sortby === "time") {
+      const productsList = await productsCollection
+        .find({})
+        .sort({ _id: 1 })
+        .skip(pageNo * 20)
+        .limit(20)
+        .toArray();
+    } else if (sortby === "likes") {
+      const productsList = await productsCollection
+        .find({})
+        .sort({ noOfLikes: 1 })
+        .skip(pageNo * 20)
+        .limit(20)
+        .toArray();
+    } else if (sortby === "stock") {
+      const productsList = await productsCollection
+        .find({})
+        .sort({ stock: 1 })
+        .skip(pageNo * 20)
+        .limit(20)
+        .toArray();
+    } else if (sortby === "alphabetical") {
+      const productsList = await productsCollection
+        .find({})
+        .sort({ title: 1 })
+        .skip(pageNo * 20)
+        .limit(20)
+        .toArray();
+    } else {
+      throw "Invalid sortBy";
+    }
+
+    if (productList.length == 0) throw "No Book in system!";
+
+    const result = [];
+
+    for (let product of productList) {
+      let {
+        _id,
+        title,
+        description,
+        productImage,
+        noOfLikes,
+        createdAt,
+        stock,
+        facet,
+      } = product;
+      _id = _id.toString();
+      result.push({
+        _id,
+        title,
+        description,
+        productImage,
+        noOfLikes,
+        createdAt,
+        stock,
+        facet,
+      });
+    }
+    return result;
   },
 };
 
