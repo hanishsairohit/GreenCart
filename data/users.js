@@ -1,24 +1,3 @@
-/*
-parameters:-
-  "userId": "123-123-123",
-  "firstName": "John",
-  "lastName": "Doe",
-  "dateOfBirth": "12/22/1990",
-  "age": "30",
-  "phoneNumber": "412-124-1253",
-  "emailId": "johnDoE@gmail.com",
-  "address":{
-  "street":"abcde",
-  "city": "NYC",
-  "state": "NY",
-  "code":"07307"
-  }
-  "profilePhoto": "/static/xyz.jpeg",
-  "password": "Encrypted Password",
-  "reviewsId": ["123-311-1233", "333-333-1111"]
-*/
-// Importing "users" collection from the database and destructuring theObjectId from mongodb
-
 const mongoCollections = require("../config/mongoCollections");
 const users = mongoCollections.users;
 let { ObjectId } = require("mongodb");
@@ -26,21 +5,16 @@ const bcrypt = require("bcryptjs");
 const saltNumber = 14;
 
 module.exports = {
-  async addUser(firstName, lastName, phoneNumber, emailId, password, address) {
+  
+    async addUser(firstName, lastName, phoneNumber, emailId, password, address) {
     // Checking if the email/userName is already used; // need to implement
-
-    // // converting email into lower case
-    // let propEmail = emailId.toLowerCase();
-    // allUser.forEach((element) => {
-    //   if (element.emailId == propEmail)
-    //     throw "Sorry but email is already in use";
-    // });
-
+      
     const hasedPassword = await bcrypt.hash(password, saltNumber);
 
     let newUser = {
       firstName: firstName,
       lastName: lastName,
+
       password: hasedPassword,
       userCreatedAt: new Date(),
       mobile: phoneNumber,
