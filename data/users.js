@@ -19,6 +19,21 @@ parameters:-
 */
 // Importing "users" collection from the database and destructuring theObjectId from mongodb
 
+// functions in this file
+
+//addUser()
+//getUser()
+//getAllUsers()
+//addCommentsToUser()
+//getUserComments()
+//userLikesAProduct()
+//getUserLikedProdcuts()
+//userPurchasesAProduct()
+//userViewsAProduct()
+//getUserViewedProdcuts()
+//getUserViewedProdcuts (duplicate)
+//getUserBoughtProducts()
+
 const mongoCollections = require("../config/mongoCollections");
 const users = mongoCollections.users;
 let { ObjectId } = require("mongodb");

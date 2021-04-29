@@ -1,7 +1,20 @@
 const mongoCollections = require("../config/mongoCollections");
 const products = mongoCollections.products;
-const uuid = require("uuid").v4;
 const { ObjectId } = require("mongodb");
+
+//functions in this file
+
+//getAllProducts()
+//getProductById(id)
+//addProduct()
+//addCommentsToProduct()
+//getProductComments()
+//addLike()
+//updateStockOfProduct()
+//deleteProduct()
+//searchProduct()
+//filterProducts()
+//sortProducts()
 
 let exportedMethods = {
   async getAllProducts() {
@@ -48,6 +61,8 @@ let exportedMethods = {
   },
 
   async addProduct(title, description, productImage, createdBy, stock, facet) {
+    const productType = require("./index").productType;
+
     const productCollection = await products();
     let newProduct = {
       title: title,
@@ -64,6 +79,37 @@ let exportedMethods = {
 
     const insertedInfo = await productCollection.insertOne(newProduct);
     if (insertedInfo.insertedCount === 0) throw "Insert failed!";
+
+    if (productType.doesProductTypeExist(facet[0]["value"])) {
+      const removedProp = facet.shift();
+      for (attribute of facet) {
+        const newProp = {
+          name: attribute.property,
+          type: typeof attribute.value,
+        };
+
+        if (
+          productType.doesPropertyOfProductTypeExist(
+            removedProp["value"],
+            newProp
+          )
+        ) {
+          productType.updateCountOfAPropertyforGivenType(
+            removedProp["value"],
+            newProp,
+            true,
+            stock
+          );
+          continue;
+        } else {
+          productType.updatePropertiesOfProduct(removedProp["value"], newProp);
+        }
+      }
+      productType.updateCountOfProducts(removedProp["value"], true, stock);
+    } else {
+      let removedProp = facet.shift();
+      productType.addNewProductType(removedProp["value"], facet, 1);
+    }
 
     return insertedInfo.insertedId.toString();
   },
@@ -120,12 +166,14 @@ let exportedMethods = {
   },
 
   async updateStockOfProduct(productID) {
+    const productType = require("./index").productType;
+
     const productsCollection = await products();
 
     const product = await this.getProductById(productID);
 
     if (product.stock == 1) {
-      this.deleteProduct(productID);
+      this.deleteProduct(product);
     } else {
       const updatedInfo = await productsCollection.updateOne(
         {
@@ -139,17 +187,53 @@ let exportedMethods = {
       );
 
       if (updatedInfo.updatedCount === 0) throw " failed to update stock";
+
+      productType.updateCountOfProducts(product.facet[0]["value"], false, 1);
+
+      for (attribute of product.facet.shift()) {
+        const newProp = {
+          name: attribute.property,
+          type: typeof attribute.value,
+        };
+
+        product.updateCountOfAPropertyforGivenType(
+          product.facet[0]["value"],
+          newProp,
+          false,
+          1
+        );
+      }
     }
   },
 
-  async deleteProduct(productID) {
+  async deleteProduct(product, stock = 1) {
+    const productType = require("./index").productType;
+
     const productsCollection = await products();
 
     const deletedInfo = await productsCollection.deleteOne({
-      _id: ObjectId(productID),
+      _id: ObjectId(product._id),
     });
+    if (deletedInfo.deletedCount === 0) throw "failed to delete a product";
 
-    if (deletedInfo.deletedCount === 0) throw " failed to delete product";
+    productType.updateCountOfProducts(product.facet[0]["value"], false, stock);
+
+    for (attribute of product.facet.shift()) {
+      const newProp = {
+        name: attribute.property,
+        type: typeof attribute.value,
+      };
+
+      product.updateCountOfAPropertyforGivenType(
+        product.facet[0]["value"],
+        newProp,
+        false,
+        stock
+      );
+    }
+
+    productType.deleteProductPropertiesWithCountZero(product.facet[0]["value"]);
+    productType.deleteProductTypeWithCountZero();
   },
 
   async searchProduct(searchTerm) {
@@ -232,11 +316,11 @@ let exportedMethods = {
       throw "Invalid sortBy";
     }
 
-    if (productList.length == 0) throw "No Book in system!";
+    if (productsList.length == 0) throw "No Book in system!";
 
     const result = [];
 
-    for (let product of productList) {
+    for (let product of productsList) {
       let {
         _id,
         title,

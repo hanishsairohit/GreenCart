@@ -3,6 +3,8 @@ const data = require("../data/index");
 const products = data.products;
 const comments = data.comments;
 const users = data.users;
+const productType = data.productType;
+const admin = data.admin;
 
 const { ObjectId } = require("mongodb");
 const { use } = require("../routes/users");
@@ -118,6 +120,63 @@ async function main() {
   const productsList1 = await products.filterProducts(prop);
 
   console.log(productsList1);
+
+  const properties = [
+    { name: "plant_height", type: "number" },
+    { name: "plant_color", type: "string" },
+  ];
+
+  const itemType1 = await productType.addNewProductType(
+    "plant",
+    properties,
+    20
+  );
+  const itemType2 = await productType.addNewProductType("seed", properties, 20);
+  const itemType3 = await productType.addNewProductType(
+    "fertilizer",
+    properties,
+    20
+  );
+
+  // const doesExist = await productType.doesProductTypeExist("plant");
+
+  const add_property = {
+    name: "plant_weight",
+    type: "number",
+  };
+
+  const help = await productType.updatePropertiesOfProduct(
+    "plant",
+    add_property
+  );
+
+  const doesExist = await productType.doesPropertyOfProductTypeExist(
+    "plant",
+    add_property
+  );
+
+  const admin1 = await admin.addAdmin(
+    "Hanish",
+    "Pallapothu",
+    "fdsc",
+    [product1],
+    "gmail.com"
+  );
+
+  //admin.getAdmin("dsf") function tested.
+
+  const update1 = await admin.adminAddsAProduct(product2, ObjectId(admin1));
+  const update2 = await admin.adminDeletesAProduct(product1, ObjectId(admin1));
+
+  console.log(admin1);
+
+  console.log(doesExist);
+
+  // console.log(doesExist);
+
+  // console.log(itemType1);
+  // console.log(itemType2);
+  // console.log(itemType3);
 
   //   const productsList = await users.getUserLikedProdcuts(user1._id);
   //   console.log(productsList);

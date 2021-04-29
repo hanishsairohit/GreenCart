@@ -4,6 +4,11 @@ const productsData = require("./products");
 const usersData = require("./users");
 const { ObjectId } = require("mongodb");
 
+// functions in this file
+
+//addComment
+//getComment
+
 async function addComment(userId, productId, commentText) {
   let newComment = {
     userId: ObjectId(userId),
