@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
     const usersInfo = await usersData.getAllUsers();
     res.json(usersInfo);
   } catch (error) {
-    res.status().json({ message: error });
+    res.status().json({ message: "No Daata (/)" });
   }
 });
 
@@ -19,48 +19,60 @@ router.get("/:id", async (req, res) => {
     const userInfo = await usersData.getUser(req.params.id);
     res.json(userInfo);
   } catch (error) {
-    res.status().json({ message: error });
+    res.status().json({ message: "No Data (/:id)" });
   }
 });
 
 router.post("/signup", async (req, res) => {
   const firstName = xss(req.body.firstName);
   const lastName = xss(req.body.lastName);
-  const email = xss(req.body.email);
+  const email = xss(req.body.emailId);
   const password = xss(req.body.password);
   const phoneNumber = xss(req.body.phoneNumber);
   const address = xss(req.body.address);
 
   errors = [];
   if (!errorCheck.stringCheck(firstName))
-    errors.push("Invalid FirstName (routes/users)");
+    // errors.push;
+    throw "Invalid FirstName (routes/users)";
   if (!errorCheck.stringCheck(lastName))
-    errors.push("Invalid LastName (routes/users)");
+    // errors.push;
+    throw "Invalid LastName (routes/users)";
   if (!errorCheck.emailValidate(email))
-    errors.push("Invalid Email (routes/users)");
+    // errors.push
+    throw "Invalid Email (routes/users)";
   if (!errorCheck.validPassword(password))
-    errors.push("Invalid Password (routes/users)");
+    // errors.push
+    throw "Invalid Password (routes/users)";
   if (!errorCheck.phoneNumberValid(phoneNumber))
-    errors.push("Invalid PhoneNumber (routes/users)");
+    // errors.push
+    throw "Invalid PhoneNumber (routes/users)";
 
   // Just for woking part I'm throwing JSON error
   if (errors.length > 0) {
-    return res.status(401).json({ errors: "Erros while fil" });
+    return res.status(401).json({ errors: "Erros while adding" });
   }
   try {
-    const newUser = await userData.addUser(
+    const newUser = await usersData.addUser(
       firstName,
       lastName,
       phoneNumber,
-      emailId,
+      email,
       password,
       address
     );
-    req.seesion.user = newUser;
+    console.log(newUser);
+    // req.seesion.user = newUser;
     //Just for now redirecting to the root route
-    res.redirect("/");
+    // res.redirect("/");
+
+    return res.render("pages/test", {
+      firstName: newUser.firstName,
+      title: "Testing",
+    });
   } catch (error) {
-    res.status(500).json({ message: error });
+    console.log(error);
+    return res.status(500).json({ message: " error from addUser()" });
   }
 });
 

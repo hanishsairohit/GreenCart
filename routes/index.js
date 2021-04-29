@@ -1,14 +1,15 @@
 // const mainRoutes = require('./routes');
 const productsRoutes = require("./products");
 const path = require("path");
+const userRoutes = require("./users.js");
 
 const constructorMethod = (app) => {
   //   app.use('/', mainRoutes);
   app.use("/products", productsRoutes);
-  app.use(
-    "*",
-    res.status(404).render("404: No Page Found!!", { title: "404: Error" })
-  );
+  app.use("/users", userRoutes);
+  app.use("*", (req, res) => {
+    res.status(404).json({ title: "404: Error" });
+  });
 };
 
 module.exports = constructorMethod;
