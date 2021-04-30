@@ -7,7 +7,14 @@ const productsData = data.products;
 router.get("/", async (req, res) => {
   try {
     let productList = await productsData.getAllProducts();
-    return res.json(productList);
+    if (productList.length > 0) {
+      hasProduct = true;
+    }
+    return res.render("pages/home", {
+      title: "All Product List",
+      productList: productList,
+      hasProduct: hasProduct,
+    });
   } catch (e) {
     return res.sendStatus(400);
   }
@@ -41,7 +48,7 @@ router.get("/product/:id", async (req, res) => {
 });
 
 //to add product to DB Only for admin use
-router.post("/products", async (req, res) => {
+router.post("/", async (req, res) => {
   const productInfo = req.body;
   console.log(req.body);
   if (!productInfo) {

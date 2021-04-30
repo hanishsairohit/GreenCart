@@ -1,3 +1,38 @@
+/*
+parameters:-
+  "userId": "123-123-123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "dateOfBirth": "12/22/1990",
+  "age": "30",
+  "phoneNumber": "412-124-1253",
+  "emailId": "johnDoE@gmail.com",
+  "address":{
+  "street":"abcde",
+  "city": "NYC",
+  "state": "NY",
+  "code":"07307"
+  }
+  "profilePhoto": "/static/xyz.jpeg",
+  "password": "Encrypted Password",
+  "reviewsId": ["123-311-1233", "333-333-1111"]
+*/
+// Importing "users" collection from the database and destructuring theObjectId from mongodb
+
+// functions in this file
+
+//addUser() // tested
+//getUser() // tested
+//getAllUsers() // tested
+//addCommentsToUser() //tested
+//getUserComments() // tested
+//userLikesAProduct() // tested
+//getUserLikedProducts() //tested
+//userPurchasesAProduct() // tested
+//userViewsAProduct() //tested
+//getUserViewedProdcuts() //tested
+//getUserBoughtProducts()// tested
+
 const mongoCollections = require("../config/mongoCollections");
 const users = mongoCollections.users;
 let { ObjectId } = require("mongodb");
@@ -100,7 +135,7 @@ module.exports = {
       throw "Update failed to add like info to user collection!";
   },
 
-  async getUserLikedProdcuts(UserID) {
+  async getUserLikedProducts(UserID) {
     const products = require("./index").products;
     const user = await this.getUser(UserID);
 
@@ -129,9 +164,7 @@ module.exports = {
     if (updatedInfo.updatedCount === 0)
       throw "Update failed to add purchase info to user collection!";
 
-    await products.updateStockOfProduct(productID);
-
-    //delete product ID. Optional. decide later.
+    await products.updateStockOfProduct(ProductID);
   },
 
   async userViewsAProduct(UserID, ProductID) {
@@ -158,17 +191,7 @@ module.exports = {
 
     const productsList = [];
     for (productID of user.viewHistory) {
-      productsList.push(await products.getProductById(productID));
-    }
-    return productsList;
-  },
-
-  async getUserViewedProdcuts(UserID) {
-    const products = require("./index").products;
-    const user = await this.getUser(UserID);
-
-    const productsList = [];
-    for (productID of user.viewHistory) {
+      console.log(productID);
       productsList.push(await products.getProductById(productID));
     }
     return productsList;
