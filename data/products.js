@@ -62,7 +62,6 @@ let exportedMethods = {
 
   async addProduct(title, description, productImage, createdBy, stock, facet) {
     const productType = require("./index").productType;
-
     const productCollection = await products();
     let newProduct = {
       title: title,
@@ -86,6 +85,7 @@ let exportedMethods = {
         const newProp = {
           name: attribute.property,
           type: typeof attribute.value,
+          values: [attribute.value],
         };
 
         if (
@@ -99,6 +99,10 @@ let exportedMethods = {
             newProp,
             true,
             stock
+          );
+          await productType.updateValuesOFAPropertyWithGivenType(
+            removedProp["value"],
+            newProp
           );
           continue;
         } else {
@@ -224,11 +228,6 @@ let exportedMethods = {
 
     const productsCollection = await products();
     const product = await this.getProductById(productID);
-
-    console.log(product);
-
-    console.log(product._id);
-    console.log(typeof product._id);
 
     const deletedInfo = await productsCollection.deleteOne({
       _id: ObjectId(product._id),

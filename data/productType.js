@@ -25,6 +25,7 @@ const { ObjectId } = require("mongodb");
 //doesPropertyOfProductTypeExist() //tested
 //deleteProductPropertiesWithCountZero() //tested
 //deleteProductTypeWithCountZero() //tested
+// updateValuesOFAPropertyWithGivenType() //tested
 
 module.exports = exportedMethods = {
   async addNewProductType(type, properties, countOfProducts) {
@@ -32,6 +33,7 @@ module.exports = exportedMethods = {
       property["count"] = countOfProducts;
       property["name"] = property.property;
       property["type"] = typeof property.value;
+      property["values"] = [property.value];
       delete property.property;
       delete property.value;
     }
@@ -184,5 +186,23 @@ module.exports = exportedMethods = {
       countOfProducts: 0,
     });
     console.log("deleted Count :", deletedInfo.deletedCount);
+  },
+
+  async updateValuesOFAPropertyWithGivenType(type, property) {
+    const productTypeCollection = await productType();
+    const updatedInfo = await productTypeCollection.updateOne(
+      {
+        type: type,
+        "properties.name": property.name,
+        "properties.type": property.type,
+      },
+      {
+        $addToSet: {
+          "properties.$.values": property.values[0],
+        },
+      }
+    );
+
+    console.log(updatedInfo.modifiedCount);
   },
 };
