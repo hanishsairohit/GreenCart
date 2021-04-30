@@ -5,10 +5,11 @@
 
         <img src="{{productImage}}" class="card-img-top" alt="{{title}} image">
         <div class="card-body">
+            <p>{{_id}}</p>
             <h5 class="card-title">{{title}}</h5>
             <p class="card-text">{{description}}</p>
             <div class="card-footer">
-                <a href="#" class="btn btn-primary">{{title}}</a>
+                <a href="/products/product/{{_id}}" class="btn btn-primary">{{title}}</a>
             </div>
         </div>
 

@@ -41,7 +41,10 @@ router.get("/:search", async (req, res) => {
 router.get("/product/:id", async (req, res) => {
   try {
     let product = await productsData.getProductById(req.params.id);
-    return res.json({ product: product });
+    return res.render("pages/singleProduct", {
+      title: product.title,
+      product: product,
+    });
   } catch (e) {
     return res.status(404).json({ error: "product not found" });
   }
