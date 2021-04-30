@@ -39,8 +39,8 @@ async function main() {
     10,
     [
       { property: "product_type", value: "plant" },
-      { property: "color", value: "brown" },
-      { property: "number_of_seeds", value: 45 },
+      { property: "color", value: "Yellow" },
+      { property: "weight", value: 70 },
     ]
   );
 
@@ -199,6 +199,7 @@ async function main() {
   await products.deleteProduct(product5);
 
   console.log(await productType.getProductTypes());
+
   // console.log(await users.getUserLikedProducts(user1._id));
   // console.log(await users.getUser(user1._id));
   // console.log(await users.getAllUsers());
