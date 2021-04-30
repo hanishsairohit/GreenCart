@@ -4,20 +4,20 @@ const admin = mongoCollections.admin;
 
 // functions in this file
 
-//addAdmin()
-//getAdmin()
-//adminAddsAProduct()
-//adminDeletesAProduct()
+//addAdmin() // tested
+//getAdmin() //tested
+//adminAddsAProduct() // tested
+//adminDeletesAProduct() //tested
 
 module.exports = {
-  async addAdmin(firstname, lastname, password, addedProducts, emailID) {
+  async addAdmin(firstname, lastname, password, emailID) {
     const adminCollection = await admin();
 
     let newAdmin = {
       firstname: firstname,
       lastname: lastname,
       password: password,
-      addedProducts: addedProducts,
+      addedProducts: [],
       emailID: emailID,
     };
 
@@ -41,10 +41,10 @@ module.exports = {
   async adminAddsAProduct(productId, AdminId) {
     const adminCollection = await admin();
     const updatedInfo = await adminCollection.updateOne(
-      { _id: AdminId },
+      { _id: ObjectId(AdminId) },
       {
         $push: {
-          addedProducts: productId,
+          addedProducts: ObjectId(productId),
         },
       }
     );
@@ -56,10 +56,10 @@ module.exports = {
   async adminDeletesAProduct(productId, AdminId) {
     const adminCollection = await admin();
     const updatedInfo = await adminCollection.updateOne(
-      { _id: AdminId },
+      { _id: ObjectId(AdminId) },
       {
         $pull: {
-          addedProducts: productId,
+          addedProducts: ObjectId(productId),
         },
       }
     );

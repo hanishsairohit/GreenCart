@@ -4,17 +4,17 @@ const { ObjectId } = require("mongodb");
 
 //functions in this file
 
-//getAllProducts()
-//getProductById(id)
-//addProduct()
-//addCommentsToProduct()
-//getProductComments()
-//addLike()
-//updateStockOfProduct()
-//deleteProduct()
-//searchProduct()
-//filterProducts()
-//sortProducts()
+//getAllProducts() // tested
+//getProductById(id) // tested
+//addProduct() // tested
+//addCommentsToProduct() // tested
+//getProductComments() // tested
+//addLike() //tested
+//updateStockOfProduct() // tested
+//deleteProduct() // tested
+//searchProduct() // tested
+//filterProducts() // tested
+//sortProducts() // partially tested // didnt test with different page no
 
 let exportedMethods = {
   async getAllProducts() {
@@ -80,7 +80,7 @@ let exportedMethods = {
     const insertedInfo = await productCollection.insertOne(newProduct);
     if (insertedInfo.insertedCount === 0) throw "Insert failed!";
 
-    if (productType.doesProductTypeExist(facet[0]["value"])) {
+    if (await productType.doesProductTypeExist(facet[0]["value"])) {
       const removedProp = facet.shift();
       for (attribute of facet) {
         const newProp = {
@@ -89,12 +89,12 @@ let exportedMethods = {
         };
 
         if (
-          productType.doesPropertyOfProductTypeExist(
+          await productType.doesPropertyOfProductTypeExist(
             removedProp["value"],
             newProp
           )
         ) {
-          productType.updateCountOfAPropertyforGivenType(
+          await productType.updateCountOfAPropertyforGivenType(
             removedProp["value"],
             newProp,
             true,
@@ -102,13 +102,21 @@ let exportedMethods = {
           );
           continue;
         } else {
-          productType.updatePropertiesOfProduct(removedProp["value"], newProp);
+          await productType.updatePropertiesOfProduct(
+            removedProp["value"],
+            newProp,
+            stock
+          );
         }
       }
-      productType.updateCountOfProducts(removedProp["value"], true, stock);
+      await productType.updateCountOfProducts(
+        removedProp["value"],
+        true,
+        stock
+      );
     } else {
       let removedProp = facet.shift();
-      productType.addNewProductType(removedProp["value"], facet, 1);
+      await productType.addNewProductType(removedProp["value"], facet, stock);
     }
 
     return insertedInfo.insertedId.toString();
@@ -135,7 +143,6 @@ let exportedMethods = {
     const product = await this.getProductById(productID);
     const comments = [];
     for (comment of product.comments) {
-      console.log(commentsData);
       comments.push(await commentsData.getComment(comment.toString()));
     }
     return comments;
@@ -188,16 +195,22 @@ let exportedMethods = {
 
       if (updatedInfo.updatedCount === 0) throw " failed to update stock";
 
-      productType.updateCountOfProducts(product.facet[0]["value"], false, 1);
+      await productType.updateCountOfProducts(
+        product.facet[0]["value"],
+        false,
+        1
+      );
 
-      for (attribute of product.facet.shift()) {
+      const removedProp = product.facet.shift();
+
+      for (attribute of product.facet) {
         const newProp = {
           name: attribute.property,
           type: typeof attribute.value,
         };
 
-        product.updateCountOfAPropertyforGivenType(
-          product.facet[0]["value"],
+        await productType.updateCountOfAPropertyforGivenType(
+          removedProp["value"],
           newProp,
           false,
           1
@@ -206,34 +219,48 @@ let exportedMethods = {
     }
   },
 
-  async deleteProduct(product, stock = 1) {
+  async deleteProduct(productID, stock = 1) {
     const productType = require("./index").productType;
 
     const productsCollection = await products();
+    const product = await this.getProductById(productID);
+
+    console.log(product);
+
+    console.log(product._id);
+    console.log(typeof product._id);
 
     const deletedInfo = await productsCollection.deleteOne({
       _id: ObjectId(product._id),
     });
     if (deletedInfo.deletedCount === 0) throw "failed to delete a product";
 
-    productType.updateCountOfProducts(product.facet[0]["value"], false, stock);
+    await productType.updateCountOfProducts(
+      product.facet[0]["value"],
+      false,
+      stock
+    );
 
-    for (attribute of product.facet.shift()) {
+    const removedProp = product.facet.shift();
+
+    for (attribute of product.facet) {
       const newProp = {
         name: attribute.property,
         type: typeof attribute.value,
       };
 
-      product.updateCountOfAPropertyforGivenType(
-        product.facet[0]["value"],
+      await productType.updateCountOfAPropertyforGivenType(
+        removedProp["value"],
         newProp,
         false,
         stock
       );
     }
 
-    productType.deleteProductPropertiesWithCountZero(product.facet[0]["value"]);
-    productType.deleteProductTypeWithCountZero();
+    await productType.deleteProductPropertiesWithCountZero(
+      removedProp["value"]
+    );
+    await productType.deleteProductTypeWithCountZero();
   },
 
   async searchProduct(searchTerm) {
@@ -284,29 +311,31 @@ let exportedMethods = {
   async sortProducts(sortby, pageNo) {
     const productsCollection = await products();
 
+    let productsList = 0;
+
     if (sortby === "time") {
-      const productsList = await productsCollection
+      productsList = await productsCollection
         .find({})
         .sort({ _id: 1 })
         .skip(pageNo * 20)
         .limit(20)
         .toArray();
     } else if (sortby === "likes") {
-      const productsList = await productsCollection
+      productsList = await productsCollection
         .find({})
-        .sort({ noOfLikes: 1 })
+        .sort({ noOfLikes: -1 }) // -1 for descending order
         .skip(pageNo * 20)
         .limit(20)
         .toArray();
     } else if (sortby === "stock") {
-      const productsList = await productsCollection
+      productsList = await productsCollection
         .find({})
-        .sort({ stock: 1 })
+        .sort({ stock: -1 }) // -1 for descending order
         .skip(pageNo * 20)
         .limit(20)
         .toArray();
     } else if (sortby === "alphabetical") {
-      const productsList = await productsCollection
+      productsList = await productsCollection
         .find({})
         .sort({ title: 1 })
         .skip(pageNo * 20)

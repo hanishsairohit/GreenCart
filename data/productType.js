@@ -15,21 +15,25 @@ const { ObjectId } = require("mongodb");
 
 // functions in this file
 
-//addNewProductType()
-//deleteProductType()
-//getProductTypes()
-//updateCountOfProducts()
-//doesProductTypeExist()
-//updateCountOfAPropertyforGivenType()
-//updatePropertiesOfProduct()
-//doesPropertyOfProductTypeExist()
-//deleteProductPropertiesWithCountZero()
-//deleteProductTypeWithCountZero()
+//addNewProductType() //tested
+//deleteProductType()//tested //We dont really need this database function.
+//getProductTypes()  //tested
+//updateCountOfProducts() //tested
+//doesProductTypeExist() //tested
+//updateCountOfAPropertyforGivenType() //tested
+//updatePropertiesOfProduct() //tested
+//doesPropertyOfProductTypeExist() //tested
+//deleteProductPropertiesWithCountZero() //tested
+//deleteProductTypeWithCountZero() //tested
 
 module.exports = exportedMethods = {
   async addNewProductType(type, properties, countOfProducts) {
     for (property of properties) {
-      property["count"] = 1;
+      property["count"] = countOfProducts;
+      property["name"] = property.property;
+      property["type"] = typeof property.value;
+      delete property.property;
+      delete property.value;
     }
     let newProductType = {
       _id: ObjectId(),
@@ -123,10 +127,10 @@ module.exports = exportedMethods = {
     );
   },
 
-  async updatePropertiesOfProduct(type, property) {
+  async updatePropertiesOfProduct(type, property, stock) {
     const productTypeCollection = await productType();
 
-    property["count"] = 1;
+    property["count"] = stock;
 
     const updatedInfo = await productTypeCollection.updateOne(
       {
@@ -151,10 +155,7 @@ module.exports = exportedMethods = {
       type: type,
     });
 
-    console.log(property);
-
     const productPropertiesList = productTypeDocument.properties;
-    console.log(productTypeDocument);
 
     for (prop of productPropertiesList) {
       if (prop.name == property.name && prop.type == property.type) {
@@ -174,13 +175,14 @@ module.exports = exportedMethods = {
         $pull: { properties: { count: 0 } }, //{ $lt: 1 }
       }
     );
-    console.log(updatedInfo);
+    console.log("updated Count :", updatedInfo.updatedCount);
   },
 
   async deleteProductTypeWithCountZero() {
+    const productTypeCollection = await productType();
     const deletedInfo = await productTypeCollection.deleteMany({
       countOfProducts: 0,
     });
-    console.log(deletedInfo);
+    console.log("deleted Count :", deletedInfo.deletedCount);
   },
 };

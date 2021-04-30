@@ -21,18 +21,17 @@ parameters:-
 
 // functions in this file
 
-//addUser()
-//getUser()
-//getAllUsers()
-//addCommentsToUser()
-//getUserComments()
-//userLikesAProduct()
-//getUserLikedProdcuts()
-//userPurchasesAProduct()
-//userViewsAProduct()
-//getUserViewedProdcuts()
-//getUserViewedProdcuts (duplicate)
-//getUserBoughtProducts()
+//addUser() // tested
+//getUser() // tested
+//getAllUsers() // tested
+//addCommentsToUser() //tested
+//getUserComments() // tested
+//userLikesAProduct() // tested
+//getUserLikedProducts() //tested
+//userPurchasesAProduct() // tested
+//userViewsAProduct() //tested
+//getUserViewedProdcuts() //tested
+//getUserBoughtProducts()// tested
 
 const mongoCollections = require("../config/mongoCollections");
 const users = mongoCollections.users;
@@ -141,7 +140,7 @@ module.exports = {
       throw "Update failed to add like info to user collection!";
   },
 
-  async getUserLikedProdcuts(UserID) {
+  async getUserLikedProducts(UserID) {
     const products = require("./index").products;
     const user = await this.getUser(UserID);
 
@@ -170,9 +169,7 @@ module.exports = {
     if (updatedInfo.updatedCount === 0)
       throw "Update failed to add purchase info to user collection!";
 
-    await products.updateStockOfProduct(productID);
-
-    //delete product ID. Optional. decide later.
+    await products.updateStockOfProduct(ProductID);
   },
 
   async userViewsAProduct(UserID, ProductID) {
@@ -199,17 +196,7 @@ module.exports = {
 
     const productsList = [];
     for (productID of user.viewHistory) {
-      productsList.push(await products.getProductById(productID));
-    }
-    return productsList;
-  },
-
-  async getUserViewedProdcuts(UserID) {
-    const products = require("./index").products;
-    const user = await this.getUser(UserID);
-
-    const productsList = [];
-    for (productID of user.viewHistory) {
+      console.log(productID);
       productsList.push(await products.getProductById(productID));
     }
     return productsList;
