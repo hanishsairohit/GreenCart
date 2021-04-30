@@ -40,21 +40,16 @@ const bcrypt = require("bcryptjs");
 const saltNumber = 14;
 
 module.exports = {
-  async addUser(firstName, lastName, phoneNumber, emailId, password, address) {
+  
+    async addUser(firstName, lastName, phoneNumber, emailId, password, address) {
     // Checking if the email/userName is already used; // need to implement
-
-    // // converting email into lower case
-    // let propEmail = emailId.toLowerCase();
-    // allUser.forEach((element) => {
-    //   if (element.emailId == propEmail)
-    //     throw "Sorry but email is already in use";
-    // });
-
+      
     const hasedPassword = await bcrypt.hash(password, saltNumber);
 
     let newUser = {
       firstName: firstName,
       lastName: lastName,
+
       password: hasedPassword,
       userCreatedAt: new Date(),
       mobile: phoneNumber,
