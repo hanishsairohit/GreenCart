@@ -1,7 +1,20 @@
 const mongoCollections = require("../config/mongoCollections");
 const products = mongoCollections.products;
-const uuid = require("uuid").v4;
 const { ObjectId } = require("mongodb");
+
+//functions in this file
+
+//getAllProducts() // tested
+//getProductById(id) // tested
+//addProduct() // tested
+//addCommentsToProduct() // tested
+//getProductComments() // tested
+//addLike() //tested
+//updateStockOfProduct() // tested
+//deleteProduct() // tested
+//searchProduct() // tested
+//filterProducts() // tested
+//sortProducts() // partially tested // didnt test with different page no
 
 let exportedMethods = {
   async getAllProducts() {
@@ -21,6 +34,7 @@ let exportedMethods = {
         productImage,
         noOfLikes,
         createdAt,
+        stock,
         facet,
       } = product;
       _id = _id.toString();
@@ -31,6 +45,7 @@ let exportedMethods = {
         productImage,
         noOfLikes,
         createdAt,
+        stock,
         facet,
       });
     }
@@ -46,6 +61,7 @@ let exportedMethods = {
   },
 
   async addProduct(title, description, productImage, createdBy, stock, facet) {
+    const productType = require("./index").productType;
     const productCollection = await products();
     let newProduct = {
       title: title,
@@ -62,6 +78,50 @@ let exportedMethods = {
 
     const insertedInfo = await productCollection.insertOne(newProduct);
     if (insertedInfo.insertedCount === 0) throw "Insert failed!";
+
+    if (await productType.doesProductTypeExist(facet[0]["value"])) {
+      const removedProp = facet.shift();
+      for (attribute of facet) {
+        const newProp = {
+          name: attribute.property,
+          type: typeof attribute.value,
+          values: [attribute.value],
+        };
+
+        if (
+          await productType.doesPropertyOfProductTypeExist(
+            removedProp["value"],
+            newProp
+          )
+        ) {
+          await productType.updateCountOfAPropertyforGivenType(
+            removedProp["value"],
+            newProp,
+            true,
+            stock
+          );
+          await productType.updateValuesOFAPropertyWithGivenType(
+            removedProp["value"],
+            newProp
+          );
+          continue;
+        } else {
+          await productType.updatePropertiesOfProduct(
+            removedProp["value"],
+            newProp,
+            stock
+          );
+        }
+      }
+      await productType.updateCountOfProducts(
+        removedProp["value"],
+        true,
+        stock
+      );
+    } else {
+      let removedProp = facet.shift();
+      await productType.addNewProductType(removedProp["value"], facet, stock);
+    }
 
     return insertedInfo.insertedId.toString();
   },
@@ -87,7 +147,6 @@ let exportedMethods = {
     const product = await this.getProductById(productID);
     const comments = [];
     for (comment of product.comments) {
-      console.log(commentsData);
       comments.push(await commentsData.getComment(comment.toString()));
     }
     return comments;
@@ -118,12 +177,14 @@ let exportedMethods = {
   },
 
   async updateStockOfProduct(productID) {
+    const productType = require("./index").productType;
+
     const productsCollection = await products();
 
     const product = await this.getProductById(productID);
 
     if (product.stock == 1) {
-      this.deleteProduct(productID);
+      this.deleteProduct(product);
     } else {
       const updatedInfo = await productsCollection.updateOne(
         {
@@ -137,17 +198,68 @@ let exportedMethods = {
       );
 
       if (updatedInfo.updatedCount === 0) throw " failed to update stock";
+
+      await productType.updateCountOfProducts(
+        product.facet[0]["value"],
+        false,
+        1
+      );
+
+      const removedProp = product.facet.shift();
+
+      for (attribute of product.facet) {
+        const newProp = {
+          name: attribute.property,
+          type: typeof attribute.value,
+        };
+
+        await productType.updateCountOfAPropertyforGivenType(
+          removedProp["value"],
+          newProp,
+          false,
+          1
+        );
+      }
     }
   },
 
-  async deleteProduct(productID) {
+  async deleteProduct(productID, stock = 1) {
+    const productType = require("./index").productType;
+
     const productsCollection = await products();
+    const product = await this.getProductById(productID);
 
     const deletedInfo = await productsCollection.deleteOne({
-      _id: ObjectId(productID),
+      _id: ObjectId(product._id),
     });
+    if (deletedInfo.deletedCount === 0) throw "failed to delete a product";
 
-    if (deletedInfo.deletedCount === 0) throw " failed to delete product";
+    await productType.updateCountOfProducts(
+      product.facet[0]["value"],
+      false,
+      stock
+    );
+
+    const removedProp = product.facet.shift();
+
+    for (attribute of product.facet) {
+      const newProp = {
+        name: attribute.property,
+        type: typeof attribute.value,
+      };
+
+      await productType.updateCountOfAPropertyforGivenType(
+        removedProp["value"],
+        newProp,
+        false,
+        stock
+      );
+    }
+
+    await productType.deleteProductPropertiesWithCountZero(
+      removedProp["value"]
+    );
+    await productType.deleteProductTypeWithCountZero();
   },
 
   async searchProduct(searchTerm) {
@@ -195,9 +307,71 @@ let exportedMethods = {
     return productsList;
   },
 
-  // will implement later
-  async sortProducts(sortby) {
-    return await this.getAllProducts();
+  async sortProducts(sortby, pageNo) {
+    const productsCollection = await products();
+
+    let productsList = 0;
+
+    if (sortby === "time") {
+      productsList = await productsCollection
+        .find({})
+        .sort({ _id: 1 })
+        .skip(pageNo * 20)
+        .limit(20)
+        .toArray();
+    } else if (sortby === "likes") {
+      productsList = await productsCollection
+        .find({})
+        .sort({ noOfLikes: -1 }) // -1 for descending order
+        .skip(pageNo * 20)
+        .limit(20)
+        .toArray();
+    } else if (sortby === "stock") {
+      productsList = await productsCollection
+        .find({})
+        .sort({ stock: -1 }) // -1 for descending order
+        .skip(pageNo * 20)
+        .limit(20)
+        .toArray();
+    } else if (sortby === "alphabetical") {
+      productsList = await productsCollection
+        .find({})
+        .sort({ title: 1 })
+        .skip(pageNo * 20)
+        .limit(20)
+        .toArray();
+    } else {
+      throw "Invalid sortBy";
+    }
+
+    if (productsList.length == 0) throw "No Book in system!";
+
+    const result = [];
+
+    for (let product of productsList) {
+      let {
+        _id,
+        title,
+        description,
+        productImage,
+        noOfLikes,
+        createdAt,
+        stock,
+        facet,
+      } = product;
+      _id = _id.toString();
+      result.push({
+        _id,
+        title,
+        description,
+        productImage,
+        noOfLikes,
+        createdAt,
+        stock,
+        facet,
+      });
+    }
+    return result;
   },
 };
 

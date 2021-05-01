@@ -19,6 +19,20 @@ parameters:-
 */
 // Importing "users" collection from the database and destructuring theObjectId from mongodb
 
+// functions in this file
+
+//addUser() // tested
+//getUser() // tested
+//getAllUsers() // tested
+//addCommentsToUser() //tested
+//getUserComments() // tested
+//userLikesAProduct() // tested
+//getUserLikedProducts() //tested
+//userPurchasesAProduct() // tested
+//userViewsAProduct() //tested
+//getUserViewedProdcuts() //tested
+//getUserBoughtProducts()// tested
+
 const mongoCollections = require("../config/mongoCollections");
 const users = mongoCollections.users;
 let { ObjectId } = require("mongodb");
@@ -26,21 +40,16 @@ const bcrypt = require("bcryptjs");
 const saltNumber = 14;
 
 module.exports = {
-  async addUser(firstName, lastName, phoneNumber, emailId, password, address) {
+  
+    async addUser(firstName, lastName, phoneNumber, emailId, password, address) {
     // Checking if the email/userName is already used; // need to implement
-
-    // // converting email into lower case
-    // let propEmail = emailId.toLowerCase();
-    // allUser.forEach((element) => {
-    //   if (element.emailId == propEmail)
-    //     throw "Sorry but email is already in use";
-    // });
-
+      
     const hasedPassword = await bcrypt.hash(password, saltNumber);
 
     let newUser = {
       firstName: firstName,
       lastName: lastName,
+
       password: hasedPassword,
       userCreatedAt: new Date(),
       mobile: phoneNumber,
@@ -126,7 +135,7 @@ module.exports = {
       throw "Update failed to add like info to user collection!";
   },
 
-  async getUserLikedProdcuts(UserID) {
+  async getUserLikedProducts(UserID) {
     const products = require("./index").products;
     const user = await this.getUser(UserID);
 
@@ -155,9 +164,7 @@ module.exports = {
     if (updatedInfo.updatedCount === 0)
       throw "Update failed to add purchase info to user collection!";
 
-    await products.updateStockOfProduct(productID);
-
-    //delete product ID. Optional. decide later.
+    await products.updateStockOfProduct(ProductID);
   },
 
   async userViewsAProduct(UserID, ProductID) {
@@ -184,17 +191,7 @@ module.exports = {
 
     const productsList = [];
     for (productID of user.viewHistory) {
-      productsList.push(await products.getProductById(productID));
-    }
-    return productsList;
-  },
-
-  async getUserViewedProdcuts(UserID) {
-    const products = require("./index").products;
-    const user = await this.getUser(UserID);
-
-    const productsList = [];
-    for (productID of user.viewHistory) {
+      console.log(productID);
       productsList.push(await products.getProductById(productID));
     }
     return productsList;

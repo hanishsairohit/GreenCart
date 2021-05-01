@@ -1,56 +1,98 @@
-
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const data = require('../data');
+const data = require("../data");
 const productsData = data.products;
 
-
-//to get all products data
-router.get('/', async (req, res) => {
+//to get all products to display on root route
+router.get("/", async (req, res) => {
   try {
     let productList = await productsData.getAllProducts();
-    res.json(productList);
+    if (productList.length > 0) {
+      hasProduct = true;
+    }
+    return res.render("pages/home", {
+      title: "All Product List",
+      productList: productList,
+      hasProduct: hasProduct,
+    });
   } catch (e) {
-    res.sendStatus(400);
+    return res.sendStatus(400);
   }
 });
 
+// product search through search term
+router.get("/:search", async (req, res) => {
+  const searchTerm = req.params.search;
+  if (!searchTerm || searchTerm.trim().length === 0) {
+    console.log(" No search Term Provided (route/products)");
+    throw "Need to provide a search term";
+  }
+  try {
+    const productList = await productsData.searchProduct(searchTerm);
+    console.log(productList);
+    return res.status(200).json({ product: productList });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ message: error });
+  }
+});
 
 //to get product by Id provided
-router.get('/:id', async (req, res) => {
+router.get("/product/:id", async (req, res) => {
   try {
     let product = await productsData.getProductById(req.params.id);
-    res.json(product);
+    return res.render("pages/singleProduct", {
+      title: product.title,
+      product: product,
+    });
   } catch (e) {
-    res.status(404).json({ error: 'product not found' });
+    return res.status(404).json({ error: "product not found" });
   }
 });
 
-//to add product to DB
-router.post('/products', async (req, res) => {
+//to add product to DB Only for admin use
+router.post("/", async (req, res) => {
   const productInfo = req.body;
   console.log(req.body);
   if (!productInfo) {
-    res.status(400).json({ error: 'You must provide data to create a Product' });
+    res
+      .status(400)
+      .json({ error: "You must provide data to create a Product" });
     return;
   }
 
   if (!productInfo.title) {
-    res.status(400).json({ error: 'You must provide a title' });
+    res.status(400).json({ error: "You must provide a title" });
     return;
   }
 
   try {
-    const { title, description, productImage, noOfLikes, comments, likedBy, createdBy, createdAt } = productInfo;
-    const newProduct = await productsData.addProducts(title, description, productImage, noOfLikes, comments, likedBy, createdBy, createdAt);
+    const {
+      title,
+      description,
+      productImage,
+      noOfLikes,
+      comments,
+      likedBy,
+      createdBy,
+      createdAt,
+    } = productInfo;
+    const newProduct = await productsData.addProducts(
+      title,
+      description,
+      productImage,
+      noOfLikes,
+      comments,
+      likedBy,
+      createdBy,
+      createdAt
+    );
     res.json(newProduct);
-    res.sendStatus(200);
+    return res.sendStatus(200);
   } catch (e) {
     console.log(e);
-    res.status(500).json({ error: "Product was not added" });
+    return res.status(500).json({ error: "Product was not added" });
   }
-
-
 });
 
 module.exports = router;
