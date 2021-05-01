@@ -1,4 +1,9 @@
-<div class="card-group mt-4 container">
+<form class="example" action="action_page.php">
+    <input type="text" placeholder="Search.." name="search">
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<div class="card-group mt-4 pt-4 container">
     {{#if hasProduct}}
     {{#each productList}}
     <div class="card p-2" style="width: 18rem;">
