@@ -21,13 +21,26 @@ app.use(
   })
 );
 
+//MIDDLEWARES
+
 // Terminate acess tif user s not logged in.
 app.use("/private", async (req, res, next) => {
-  if (!req.session.id) {
+  if (!req.session.user) {
     // TODO: need to implement error file to reDirect or render
     return res.redirect("/");
   } else {
     next();
+  }
+});
+
+// buy button middleware
+//if logged in will add to cart , else go to login page.
+app.use("/addToCart", async (req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect("/login");
+  } else {
+    //buy button should trigger
+    return res.redirect("/");
   }
 });
 
