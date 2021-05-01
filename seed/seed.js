@@ -58,8 +58,8 @@ async function main() {
   );
 
   const product4 = await products.addProduct(
-    "french seeds",
-    "seeds are from french",
+    "China seeds",
+    "seeds are from china",
     "https://i.pinimg.com/originals/da/33/bf/da33bf18c254ea101672892c612679fb.jpg",
     "seed.js",
     67,
