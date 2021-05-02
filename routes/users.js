@@ -23,6 +23,59 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.get('/signin', async (req, res) => { 
+	if (req.session.userId) {		
+		return res.redirect('/index');
+	}
+    res.render('index/signin');
+});
+
+router.post('/signin', async (req, res) => {
+  const email = xss(req.body.email.trim())
+  const password = xss(req.body.password.trim())
+  let userClient;
+
+  errors = [];
+
+  if (!verifier.validString(email)) errors.push('Invalid user E-mail address.');
+  if (!verifier.validString(password)) errors.push('Invalid password.');
+
+  const users = await userData.getAllUsers();
+  for (let i = 0; i < users.length; i++){
+      if (users[i].email == email){
+          userClient = users[i];
+      }
+  }
+
+  if (!userClient) errors.push("User E-mail address or password does not match.");
+
+  if (errors.length > 0) {
+      return res.status(401).render('users/signin',{ title: "Sign In", partial: "login-script", errors: errors });
+  }
+
+  let match = await bcrypt.compare(password, userClient.hashedPassword);
+
+  if (match){
+      req.session.user = userClient;
+      let comp = req.session.previousRoute;
+      if (comp) {
+          req.session.previousRoute = '';
+          return res.redirect(comp);
+      } 
+      res.redirect('/');
+  } else {
+      errors.push("User E-mail address or password does not match");
+      return res.status(401).render('users/signin', { title: "Errors", partial: "login-script", errors: errors });
+  }
+});
+
+router.get('/signup', async (req, res) => {
+    if (req.session.emailId) {		
+		return res.redirect('/index');
+	}
+	res.render('index/signup');
+});
+
 router.post("/signup", async (req, res) => {
   const firstName = xss(req.body.firstName);
   const lastName = xss(req.body.lastName);
