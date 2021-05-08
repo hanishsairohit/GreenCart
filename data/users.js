@@ -22,34 +22,41 @@ parameters:-
 // functions in this file
 
 //addUser() // tested
-//getUser() // tested
-//getAllUsers() // tested
-//addCommentsToUser() //tested
-//getUserComments() // tested
-//userLikesAProduct() // tested
-//getUserLikedProducts() //tested
-//userPurchasesAProduct() // tested
-//userViewsAProduct() //tested
-//getUserViewedProdcuts() //tested
-//getUserBoughtProducts()// tested
+//getUser() // tested // Error Handling
+//getAllUsers() // tested // Error Handling
+//addCommentsToUser() //tested // Error Handling
+//getUserComments() // tested // Error Handling
+//userLikesAProduct() // tested // Error Handling
+//getUserLikedProducts() //tested // Error Handling
+//userPurchasesAProduct() // tested // Error Handling
+//userViewsAProduct() //tested // Error Handling
+//getUserViewedProdcuts() //tested // Error Handling
+//getUserBoughtProducts()// tested // Error Handling
 
 const mongoCollections = require("../config/mongoCollections");
 const users = mongoCollections.users;
 let { ObjectId } = require("mongodb");
 const bcrypt = require("bcryptjs");
 const saltNumber = 14;
+const errorHandler = require("../Error/DatabaseErrorHandling");
 
 module.exports = {
-  
-    async addUser(firstName, lastName, phoneNumber, emailId, password, address) {
-    // Checking if the email/userName is already used; // need to implement
-      
+  // need to implement if email already exists in the database or not.
+
+  async addUser(firstName, lastName, phoneNumber, emailId, password, address) {
+    errorHandler.checkString(firstName, "First Name");
+    errorHandler.checkString(lastName, "Last Name");
+    errorHandler.checkEmail(emailId, "email ID");
+    errorHandler.checkString(password, "Password");
+    errorHandler.checkPhoneNumber(phoneNumber);
+    errorHandler.checkPassword(password);
+    errorHandler.checkAddress(address);
+
     const hasedPassword = await bcrypt.hash(password, saltNumber);
 
     let newUser = {
       firstName: firstName,
       lastName: lastName,
-
       password: hasedPassword,
       userCreatedAt: new Date(),
       mobile: phoneNumber,
@@ -69,6 +76,7 @@ module.exports = {
   },
 
   async getUser(userId) {
+    errorHandler.checkStringObjectId(userId, "User ID");
     const parsedId = ObjectId(userId);
     const usersCollection = await users();
     const user = await usersCollection.findOne({ _id: parsedId });
@@ -92,6 +100,8 @@ module.exports = {
   },
 
   async addCommentsToUser(userID, commentID) {
+    errorHandler.checkStringObjectId(userID, "user ID");
+    errorHandler.checkStringObjectId(commentID, "Comment ID");
     const usersCollection = await users();
     const updatedInfo = await usersCollection.updateOne(
       {
@@ -107,6 +117,7 @@ module.exports = {
     if (updatedInfo.updatedCount === 0) throw "Update failed to add a comment!";
   },
   async getUserComments(UserID) {
+    errorHandler.checkStringObjectId(UserID, "User ID");
     const commentsData = require("./index").comments;
     const user = await this.getUser(UserID);
     const comments = [];
@@ -118,6 +129,8 @@ module.exports = {
   },
 
   async userLikesAProduct(UserID, ProductID) {
+    errorHandler.checkStringObjectId(UserID, "User ID");
+    errorHandler.checkStringObjectId(ProductID, "Product ID");
     const usersCollection = await users();
 
     const updatedInfo = await usersCollection.updateOne(
@@ -136,17 +149,20 @@ module.exports = {
   },
 
   async getUserLikedProducts(UserID) {
+    errorHandler.checkStringObjectId(UserID, "User ID");
     const products = require("./index").products;
     const user = await this.getUser(UserID);
 
     const productsList = [];
     for (productID of user.LikeHistory) {
-      productsList.push(await products.getProductById(productID));
+      productsList.push(await products.getProductById(productID.toString()));
     }
     return productsList;
   },
 
   async userPurchasesAProduct(UserID, ProductID) {
+    errorHandler.checkStringObjectId(UserID, "User ID");
+    errorHandler.checkStringObjectId(ProductID, "Product ID");
     const products = require("./index").products;
     const usersCollection = await users();
 
@@ -168,6 +184,8 @@ module.exports = {
   },
 
   async userViewsAProduct(UserID, ProductID) {
+    errorHandler.checkStringObjectId(UserID, "User ID");
+    errorHandler.checkStringObjectId(ProductID, "Product ID");
     const usersCollection = await users();
 
     const updatedInfo = await usersCollection.updateOne(
@@ -186,24 +204,25 @@ module.exports = {
   },
 
   async getUserViewedProdcuts(UserID) {
+    errorHandler.checkStringObjectId(UserID, "User ID");
     const products = require("./index").products;
     const user = await this.getUser(UserID);
 
     const productsList = [];
     for (productID of user.viewHistory) {
-      console.log(productID);
-      productsList.push(await products.getProductById(productID));
+      productsList.push(await products.getProductById(productID.toString()));
     }
     return productsList;
   },
 
   async getUserBoughtProducts(UserID) {
+    errorHandler.checkStringObjectId(UserID, "User ID");
     const products = require("./index").products;
     const user = await this.getUser(UserID);
 
     const productsList = [];
     for (productID of user.purchaseHistory) {
-      productsList.push(await products.getProductById(productID));
+      productsList.push(await products.getProductById(productID.toString()));
     }
     return productsList;
   },

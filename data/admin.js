@@ -1,22 +1,33 @@
 let { ObjectId } = require("mongodb");
 const mongoCollections = require("../config/mongoCollections");
 const admin = mongoCollections.admin;
+const bcrypt = require("bcryptjs");
+const errorHandler = require("../Error/DatabaseErrorHandling");
 
 // functions in this file
 
-//addAdmin() // tested
-//getAdmin() //tested
-//adminAddsAProduct() // tested
-//adminDeletesAProduct() //tested
+//addAdmin() // tested //Error Handling
+//getAdmin() //tested  // Error Handling
+//adminAddsAProduct() // tested // Error Handling
+//adminDeletesAProduct() //tested  //Error Handling
+
+const saltNumber = 14;
 
 module.exports = {
   async addAdmin(firstname, lastname, password, emailID) {
+    errorHandler.checkString(firstname, "First Name");
+    errorHandler.checkString(lastname, "Last Name");
+    errorHandler.checkString(password, "Password");
+    errorHandler.checkEmail(emailID, "email ID");
+    errorHandler.checkPassword(password);
+
     const adminCollection = await admin();
+    const hasedPassword = await bcrypt.hash(password, saltNumber);
 
     let newAdmin = {
       firstname: firstname,
       lastname: lastname,
-      password: password,
+      password: hasedPassword,
       addedProducts: [],
       emailID: emailID,
     };
@@ -29,6 +40,7 @@ module.exports = {
   },
 
   async getAdmin(adminId) {
+    errorHandler.checkStringObjectId(adminId, "Admin Id");
     const adminCollection = await admin();
 
     const adminInfo = await adminCollection.findOne({ _id: ObjectId(adminId) });
@@ -39,6 +51,8 @@ module.exports = {
   },
 
   async adminAddsAProduct(productId, AdminId) {
+    errorHandler.checkStringObjectId(productId, "Product Id");
+    errorHandler.checkStringObjectId(AdminId, "Admin Id");
     const adminCollection = await admin();
     const updatedInfo = await adminCollection.updateOne(
       { _id: ObjectId(AdminId) },
@@ -54,6 +68,8 @@ module.exports = {
   },
 
   async adminDeletesAProduct(productId, AdminId) {
+    errorHandler.checkStringObjectId(productId, "Product Id");
+    errorHandler.checkStringObjectId(AdminId, "Admin Id");
     const adminCollection = await admin();
     const updatedInfo = await adminCollection.updateOne(
       { _id: ObjectId(AdminId) },

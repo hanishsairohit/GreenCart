@@ -7,13 +7,6 @@ const productType = data.productType;
 const admin = data.admin;
 
 const { ObjectId } = require("mongodb");
-const { use } = require("../routes/users");
-address = {
-  street: "abcde",
-  city: "NYC",
-  state: "NY",
-  code: "07307",
-};
 
 async function main() {
   const db = await dbConnection();
@@ -89,7 +82,7 @@ async function main() {
   const user1 = await users.addUser(
     "Hanish",
     "Pallapothu",
-    9293258425,
+    "9293258425",
     "hanishrohit@gmail.com",
     "hanishPassword",
     {
@@ -104,8 +97,6 @@ async function main() {
   const user2 = await users.addUser(
     "Dhruv",
     "D",
-    "02/02/1997",
-    23,
     "9293258420",
     "Dhriv@gmail.com",
     "DhruvDhruv",
@@ -163,19 +154,22 @@ async function main() {
   // await products.deleteProduct(product1, 27);
   // console.log(await products.searchProduct("plant"));
 
-  const prop = [
-    { property: "color", value: "brown" },
-    { property: "number_of_seeds", value: 45 },
-  ];
+  // const prop = [
+  //   { property: "color", value: "brown" },
+  //   { property: "number_of_seeds", value: 45 },
+  // ];
   // console.log(await products.filterProducts(prop));
 
   await users.userPurchasesAProduct(user1._id, product2);
 
   console.log(await users.getUserBoughtProducts(user1._id));
+  console.log("hello");
 
   await users.userViewsAProduct(user2._id, product1);
   console.log(await users.getUser(user2._id));
   console.log(await users.getUserViewedProdcuts(user2._id));
+
+  console.log("ujkj");
 
   const admin1 = await admin.addAdmin(
     "Patrick",
@@ -200,34 +194,36 @@ async function main() {
 
   console.log(await productType.getProductTypes());
 
-  // console.log(await users.getUserLikedProducts(user1._id));
-  // console.log(await users.getUser(user1._id));
-  // console.log(await users.getAllUsers());
-  // console.log(await products.sortProducts("stock", 0));
-  // // below code is for testing database functions.
+  console.log(await users.getUserLikedProducts(user1._id));
+  console.log(await users.getUser(user1._id));
+  console.log(await users.getAllUsers());
+  console.log(await products.sortProducts("stock", 0));
+  // below code is for testing database functions.
 
-  // //   const productsInfp = await products.getAllProducts();
-  // const userData = await users.getUser(user1._id);
-  // const produtInf = await products.getProductById(product1);
+  //   const productsInfp = await products.getAllProducts();
+  const userData = await users.getUser(user1._id);
+  const produtInf = await products.getProductById(product1);
 
-  // //   const productsList1 = await products.searchProduct("harvested");
+  //   const productsList1 = await products.searchProduct("harvested");
 
-  // const prop = { color: "green", product_type: "plant" };
+  const prop = { color: "green", product_type: "plant" };
 
-  // const productsList1 = await products.filterProducts(prop);
+  const productsList1 = await products.filterProducts(prop);
 
-  // console.log(productsList1);
+  console.log(productsList1);
+  console.log("ghbjn");
 
-  // const properties = [
-  //   { name: "plant_height", type: "number" },
-  //   { name: "plant_color", type: "string" },
-  // ];
+  const properties = [
+    { property: "plant_height", value: 30 },
+    { property: "plant_color", value: "green" },
+  ];
 
-  // const itemType1 = await productType.addNewProductType(
-  //   "plant",
-  //   properties,
-  //   20
-  // );
+  const itemType1 = await productType.addNewProductType(
+    "plant",
+    properties,
+    20
+  );
+
   // const itemType2 = await productType.addNewProductType("seed", properties, 20);
   // const itemType3 = await productType.addNewProductType(
   //   "fertilizer",
@@ -235,57 +231,51 @@ async function main() {
   //   20
   // );
 
-  // // const doesExist = await productType.doesProductTypeExist("plant");
+  // const doesExist = await productType.doesProductTypeExist("plant");
 
-  // const add_property = {
-  //   name: "plant_weight",
-  //   type: "number",
-  // };
+  const add_property = {
+    name: "plant_weight",
+    type: "number",
+  };
 
-  // const help = await productType.updatePropertiesOfProduct(
-  //   "plant",
-  //   add_property
-  // );
+  console.log("efd");
 
-  // const doesExist = await productType.doesPropertyOfProductTypeExist(
-  //   "plant",
-  //   add_property
-  // );
+  const help = await productType.updatePropertiesOfProduct(
+    "plant",
+    add_property,
+    30
+  );
+  console.log("efd");
 
-  // const admin1 = await admin.addAdmin(
-  //   "Hanish",
-  //   "Pallapothu",
-  //   "fdsc",
-  //   [product1],
-  //   "gmail.com"
-  // );
+  const doesExist = await productType.doesPropertyOfProductTypeExist(
+    "plant",
+    add_property
+  );
+  console.log("efd");
 
-  // //admin.getAdmin("dsf") function tested.
+  const update1 = await admin.adminAddsAProduct(product2, admin1);
+  console.log(":f");
+  const update2 = await admin.adminDeletesAProduct(product1, admin1);
 
-  // const update1 = await admin.adminAddsAProduct(product2, ObjectId(admin1));
-  // const update2 = await admin.adminDeletesAProduct(product1, ObjectId(admin1));
+  console.log(admin1);
 
-  // console.log(admin1);
+  console.log(doesExist);
 
-  // console.log(doesExist);
+  console.log(doesExist);
 
-  // console.log(doesExist);
+  console.log(itemType1);
 
-  // console.log(itemType1);
-  // console.log(itemType2);
-  // console.log(itemType3);
+  const productsList = await users.getUserLikedProducts(user1._id);
+  console.log(productsList);
 
-  //   const productsList = await users.getUserLikedProdcuts(user1._id);
-  //   console.log(productsList);
+  console.log(userData);
 
-  //   console.log(userData);
+  const commentsOfprp = await products.getProductComments(product1);
+  console.log("Ddd");
+  console.log(commentsOfprp);
+  const commentsOfuser = await users.getUserComments(user1._id);
 
-  //   const commentsOfprp = await products.getProductComments(product1);
-  //   console.log("Ddd");
-  //   console.log(commentsOfprp);
-  //   const commentsOfuser = await users.getUserComments(user1._id);
-
-  //   console.log(produtInf);
+  console.log(produtInf);
 
   await db.serverConfig.close();
 }
