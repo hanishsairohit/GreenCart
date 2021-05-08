@@ -14,6 +14,37 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Users Details Pages
+router.get("/details", async (req, res) => {
+  try {
+    // if (req.session.userId) {
+    const userInfo = await usersData.getUser(req.params.id);
+    const userComments = await usersData.getUserComments(req.params.id);
+    // const userLikes = await usersData.getUserLikedProducts(req.params.id);
+    const userViewedProduct = await usersData.getUserViewedProducts(
+      req.params.id
+    );
+    const userBoughtProducts = await usersData.getUserBoughtProducts(
+      req.params.id
+    );
+
+    return res.render("pages/userDetail", {
+      title: "User Info page",
+      userInfo: userInfo,
+      comments: userComments,
+      // likes: userLikes,
+      viewdProduct: userViewedProduct,
+      purchase: userBoughtProducts,
+    });
+    // }
+    //    else {
+    //     return res.json({ message: "Not  signedIn" });
+    //   }
+  } catch (error) {
+    return res.status(404).json({ message: error });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const userInfo = await usersData.getUser(req.params.id);
@@ -23,57 +54,66 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.get('/signin', async (req, res) => { 
-	if (req.session.userId) {		
-		return res.redirect('/index');
-	}
-    res.render('index/signin');
+router.get("/signin", async (req, res) => {
+  if (req.session.userId) {
+    return res.redirect("/index");
+  }
+  res.render("index/signin");
 });
 
-router.post('/signin', async (req, res) => {
-  const email = xss(req.body.email.trim())
-  const password = xss(req.body.password.trim())
+router.post("/signin", async (req, res) => {
+  const email = xss(req.body.email.trim());
+  const password = xss(req.body.password.trim());
   let userClient;
 
   errors = [];
 
-  if (!verifier.validString(email)) errors.push('Invalid user E-mail address.');
-  if (!verifier.validString(password)) errors.push('Invalid password.');
+  if (!verifier.validString(email)) errors.push("Invalid user E-mail address.");
+  if (!verifier.validString(password)) errors.push("Invalid password.");
 
   const users = await userData.getAllUsers();
-  for (let i = 0; i < users.length; i++){
-      if (users[i].email == email){
-          userClient = users[i];
-      }
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].email == email) {
+      userClient = users[i];
+    }
   }
 
-  if (!userClient) errors.push("User E-mail address or password does not match.");
+  if (!userClient)
+    errors.push("User E-mail address or password does not match.");
 
   if (errors.length > 0) {
-      return res.status(401).render('users/signin',{ title: "Sign In", partial: "login-script", errors: errors });
+    return res.status(401).render("users/signin", {
+      title: "Sign In",
+      partial: "login-script",
+      errors: errors,
+    });
   }
 
   let match = await bcrypt.compare(password, userClient.hashedPassword);
 
-  if (match){
-      req.session.user = userClient;
-      let comp = req.session.previousRoute;
-      if (comp) {
-          req.session.previousRoute = '';
-          return res.redirect(comp);
-      } 
-      res.redirect('/');
+  if (match) {
+    req.session.user = userClient;
+    let comp = req.session.previousRoute;
+    if (comp) {
+      req.session.previousRoute = "";
+      return res.redirect(comp);
+    }
+    res.redirect("/");
   } else {
-      errors.push("User E-mail address or password does not match");
-      return res.status(401).render('users/signin', { title: "Errors", partial: "login-script", errors: errors });
+    errors.push("User E-mail address or password does not match");
+    return res.status(401).render("users/signin", {
+      title: "Errors",
+      partial: "login-script",
+      errors: errors,
+    });
   }
 });
 
-router.get('/signup', async (req, res) => {
-    if (req.session.emailId) {		
-		return res.redirect('/index');
-	}
-	res.render('index/signup');
+router.get("/signup", async (req, res) => {
+  if (req.session.userId) {
+    return res.redirect("/index");
+  }
+  res.render("index/signup");
 });
 
 router.post("/signup", async (req, res) => {
@@ -114,7 +154,7 @@ router.post("/signup", async (req, res) => {
       password,
       address
     );
-    console.log(newUser);
+    // console.log(newUser);
     // req.seesion.user = newUser;
     //Just for now redirecting to the root route
     // res.redirect("/");

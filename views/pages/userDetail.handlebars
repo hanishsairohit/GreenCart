@@ -1,0 +1,32 @@
+<h1>{{userInfo.firstName}} {{userInfo.lastName}}</h1>
+
+
+<h2>Purchase History</h2>
+
+<ul>
+    {{#each purchase}}
+    <li><a data-href="/product/{{this._id}}">{{this.title}}</a></li>
+    {{/each}}
+</ul>
+
+
+
+<h2>Comments</h2>
+
+<ul>
+    {{#each comments}}
+    <li><a data-href="/product/{{this.productId}}">{{this.commentText}}</a></li>
+    {{/each}}
+</ul>
+
+
+
+
+<h2>Viewd Products</h2>
+
+<ul>
+    {{#each viewdProduct}}
+    <li><a data-href="/product/{{this._id}}">{{this.title}}</a></li>
+
+    {{/each}}
+</ul>
