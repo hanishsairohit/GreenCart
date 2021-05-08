@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "node ./seed/seed.js",
+    "seed": "node ./seed/seed_database.js",
     "start": "nodemon app.js"
   },
   "repository": {
