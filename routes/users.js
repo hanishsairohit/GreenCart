@@ -17,29 +17,28 @@ router.get("/", async (req, res) => {
 // Users Details Pages
 router.get("/details", async (req, res) => {
   try {
-    // if (req.session.userId) {
-    const userInfo = await usersData.getUser(req.params.id);
-    const userComments = await usersData.getUserComments(req.params.id);
-    // const userLikes = await usersData.getUserLikedProducts(req.params.id);
-    const userViewedProduct = await usersData.getUserViewedProducts(
-      req.params.id
-    );
-    const userBoughtProducts = await usersData.getUserBoughtProducts(
-      req.params.id
-    );
+    if (req.session.user) {
+      const userInfo = await usersData.getUser(req.params.id);
+      const userComments = await usersData.getUserComments(req.params.id);
+      // const userLikes = await usersData.getUserLikedProducts(req.params.id);
+      const userViewedProduct = await usersData.getUserViewedProducts(
+        req.params.id
+      );
+      const userBoughtProducts = await usersData.getUserBoughtProducts(
+        req.params.id
+      );
 
-    return res.render("pages/userDetail", {
-      title: "User Info page",
-      userInfo: userInfo,
-      comments: userComments,
-      // likes: userLikes,
-      viewdProduct: userViewedProduct,
-      purchase: userBoughtProducts,
-    });
-    // }
-    //    else {
-    //     return res.json({ message: "Not  signedIn" });
-    //   }
+      return res.render("pages/userDetail", {
+        title: "User Info page",
+        userInfo: userInfo,
+        comments: userComments,
+        // likes: userLikes,
+        viewdProduct: userViewedProduct,
+        purchase: userBoughtProducts,
+      });
+    } else {
+      return res.json({ message: "Not  signedIn" });
+    }
   } catch (error) {
     return res.status(404).json({ message: error });
   }
@@ -56,9 +55,9 @@ router.get("/:id", async (req, res) => {
 
 router.get("/signin", async (req, res) => {
   if (req.session.userId) {
-    return res.redirect("/index");
+    return res.redirect("/products"); //temporarily    redirect to products route
   }
-  res.render("index/signin");
+  return res.render("pages/login-page", { title: "Login Page" });
 });
 
 router.post("/signin", async (req, res) => {
@@ -82,7 +81,7 @@ router.post("/signin", async (req, res) => {
     errors.push("User E-mail address or password does not match.");
 
   if (errors.length > 0) {
-    return res.status(401).render("users/signin", {
+    return res.status(401).render("pages/login-page", {
       title: "Sign In",
       partial: "login-script",
       errors: errors,
@@ -110,10 +109,10 @@ router.post("/signin", async (req, res) => {
 });
 
 router.get("/signup", async (req, res) => {
-  if (req.session.userId) {
-    return res.redirect("/index");
+  if (req.session.user) {
+    return res.redirect("/products");
   }
-  res.render("index/signup");
+  return res.render("pages/signup-page");
 });
 
 router.post("/signup", async (req, res) => {
@@ -159,7 +158,7 @@ router.post("/signup", async (req, res) => {
     //Just for now redirecting to the root route
     // res.redirect("/");
 
-    return res.render("pages/test", {
+    return res.render("pages/signup", {
       firstName: newUser.firstName,
       title: "Testing",
     });

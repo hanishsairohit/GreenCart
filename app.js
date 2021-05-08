@@ -23,11 +23,11 @@ app.use(
 
 //MIDDLEWARES
 
-// Terminate acess tif user s not logged in.
-app.use("/private", async (req, res, next) => {
+// Terminate acess if user is not logged in.
+app.use("/users/private", async (req, res, next) => {
   if (!req.session.user) {
     // TODO: need to implement error file to reDirect or render
-    return res.redirect("/");
+    return res.render("pages/login-page");
   } else {
     next();
   }
