@@ -97,7 +97,7 @@ router.patch("/product/addtocart/:id", async (req, res) => {
     res.sendStatus(200);
   } catch (error) {
     console.log(error);
-    res.sendStatus(404);
+    res.sendStatus(404);+
   }
 });
 
@@ -151,35 +151,35 @@ router.get("/search/:searchTerm", async (req, res) => {
 //to add product to DB Only for admin use
 router.post("/product", async (req, res) => {
   const productInfo = req.body;
-
+  console.log(productInfo);
   try {
     errorHandler.checkObject(productInfo, "Product form data");
     errorHandler.checkString(productInfo.title, "title");
     errorHandler.checkString(productInfo.description, "Description");
-    errorHandler.checkString(productInfo.productImage, "Product Image"); //have to check other test cases
-    errorHandler.checkString(productInfo.createdBy, "Created By");
-    errorHandler.checkInt(productInfo.stock, "Stock");
-    errorHandler.checkFacet(productInfo.facet);
-    errorHandler.checkFloat(productInfo.price, "price");
+    // errorHandler.checkString(productInfo.productImage, "Product Image"); //have to check other test cases
+    // errorHandler.checkString(productInfo.createdBy, "Created By");
+    // errorHandler.checkInt(productInfo.stock, "Stock");
+    // errorHandler.checkFacet(productInfo.facet);
+    // errorHandler.checkFloat(productInfo.price, "price");
 
     const {
       title,
-      description,
-      productImage,
-      createdBy,
-      stock,
-      facet,
-      price,
+      description
+      // productImage,
+      // createdBy,
+      // stock,
+      // facet,
+      // price,
     } = productInfo;
 
     const newProduct = await productsData.addProduct(
       title,
-      description,
-      productImage,
-      createdBy,
-      stock,
-      facet,
-      price
+      description
+      // productImage,
+      // createdBy,
+      // stock,
+      // facet,
+      // price
     );
     res.json(newProduct);
     res.status(200);

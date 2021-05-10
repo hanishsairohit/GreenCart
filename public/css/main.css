@@ -110,6 +110,7 @@
   }
 }
 
+<<<<<<< HEAD
 .form-control {
   border-color: #eee;
   min-height: 41px;
@@ -180,4 +181,33 @@
 }
 .signup-form form a:hover {
   text-decoration: underline;
+=======
+/* css for single product page */
+.location{
+    padding: 1%;
+}
+#single_prod_section{
+    color:gray;
+    text-align: center;
+}
+.single_h3{
+    font-weight: bold;
+}
+#review_post{
+    margin-right: 100px;
+}
+
+#single_extra{
+    background-color: #c7f575;
+    padding: 2%;
+}
+#cart_container{
+    background-color: #dffbaa94;
+    height: auto;
+    padding-top: 2%;
+    margin-top: 2%;
+}
+.modal-body{
+    height: 450px;
+>>>>>>> 222290c06694c708ac15fb5400c477adecf55670
 }
