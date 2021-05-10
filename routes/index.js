@@ -9,7 +9,7 @@ const constructorMethod = (app) => {
   //   return res.render("pages/home", { title: "In Home" });
   // });
   app.use("/users", userRoutes);
-  app.use("/products", productsRoutes);
+  app.use("/", productsRoutes);
 
   app.use("/admin", adminRoutes);
   app.use("/comments", commentsRoutes);
