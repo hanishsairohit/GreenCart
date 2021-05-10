@@ -1,22 +1,20 @@
 <div id="add_new_product">
-    {{!-- <button type="button" class="btn btn-primary" id="add_product">Add New</button> --}}
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong"> Add New</button>
-    <button type="button" class="btn btn-warning">Reset</button>
     <!-- Modal -->
         <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle"></h5>Add New Product</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="contactForm" name="contact" role="form">
+                <form id="productForm" name="product" role="form">
                     <div class="modal-body">				
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" name="name" class="form-control">
+                            <input type="text" name="title" class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="type">Type</label>
@@ -24,20 +22,20 @@
                         </div>
                          <div class="form-group">
                             <label for="price">Price</label>
-                            <input type="text" name="price" class="form-control">
+                            <input type="number" name="price" class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="message">Description</label>
-                            <textarea name="message" class="form-control"></textarea>
+                            <textarea name="description" class="form-control"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="media">Product Image</label>
-                            <input type="file" name="media" class="form-control">
+                            <input type="file" name="productImage" class="form-control">
                         </div>					
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-primary" id="add_product_sub">Add Product</button>
                     </div>
                 </form>
                 </div>
