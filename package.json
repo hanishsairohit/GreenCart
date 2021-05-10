@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "node ./seed/seed.js",
+    "seed": "node ./seed/seed_database.js",
     "start": "nodemon app.js"
   },
   "repository": {
@@ -30,6 +30,6 @@
     "mongodb": "^3.6.6",
     "nodemon": "^2.0.7",
     "uuidv4": "^6.2.7",
-    "xss": "^1.0.8"
+    "xss": "^1.0.9"
   }
 }

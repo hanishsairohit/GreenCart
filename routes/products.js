@@ -50,7 +50,7 @@ router.get("/product/:id", async (req, res) => {
   }
 });
 
-//to add product to DB Only for admin use
+//adding products into the database (admin access only)
 router.post("/", async (req, res) => {
   const productInfo = req.body;
   console.log(req.body);

@@ -9,5 +9,5 @@ module.exports = {
   comments,
   products,
   productType,
-  admin,
+  admin
 };

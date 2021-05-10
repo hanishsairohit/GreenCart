@@ -1,6 +1,8 @@
 const productType = require("../config/mongoCollections").productType;
 const { ObjectId } = require("mongodb");
 
+const errorHandler = require("../Error/DatabaseErrorHandling");
+
 // Sample ProductType document
 
 // let productType = {
@@ -13,22 +15,25 @@ const { ObjectId } = require("mongodb");
 //   countOfProducts: 10,
 // };
 
-// functions in this file
-
-//addNewProductType() //tested
-//deleteProductType()//tested //We dont really need this database function.
-//getProductTypes()  //tested
-//updateCountOfProducts() //tested
-//doesProductTypeExist() //tested
-//updateCountOfAPropertyforGivenType() //tested
-//updatePropertiesOfProduct() //tested
-//doesPropertyOfProductTypeExist() //tested
-//deleteProductPropertiesWithCountZero() //tested
-//deleteProductTypeWithCountZero() //tested
-// updateValuesOFAPropertyWithGivenType() //tested
+//addNewProductType() //tested //Error Handling
+//deleteProductType()//tested  //Error Handling //We dont really need this database function.
+//getProductTypes()  //tested //Error Handling
+//updateCountOfProducts() //tested //Error Handling
+//doesProductTypeExist() //tested //Error Handling
+//updateCountOfAPropertyforGivenType() //tested //Error Handling
+//updatePropertiesOfProduct() //tested //Error Handling
+//doesPropertyOfProductTypeExist() //tested //Error Handling
+//deleteProductPropertiesWithCountZero() //tested //Error Handling
+//deleteProductTypeWithCountZero() //tested //Error Handling
+// updateValuesOFAPropertyWithGivenType() //tested //Error Handling
 
 module.exports = exportedMethods = {
   async addNewProductType(type, properties, countOfProducts) {
+    errorHandler.checkString(type, "Product Type");
+    errorHandler.checkInt(countOfProducts, "Count of products");
+    errorHandler.checkPropertiesOfProduct(properties);
+
+    console.log("fe");
     for (property of properties) {
       property["count"] = countOfProducts;
       property["name"] = property.property;
@@ -53,6 +58,7 @@ module.exports = exportedMethods = {
   },
 
   async deleteProductType(type) {
+    errorHandler.checkString(type, "Product Type");
     const productTypeCollection = await productType();
     const deletedInfo = await productTypeCollection.deleteOne({ type: type });
 
@@ -70,6 +76,10 @@ module.exports = exportedMethods = {
   },
 
   async updateCountOfProducts(type, increaseByOne, stock) {
+    errorHandler.checkString(type, "Product Type");
+    errorHandler.checkBoolean(increaseByOne, "increaseByOne");
+    errorHandler.checkInt(stock, stock);
+
     let increaseBy = 0;
 
     if (increaseByOne) {
@@ -91,6 +101,7 @@ module.exports = exportedMethods = {
   },
 
   async doesProductTypeExist(type) {
+    errorHandler.checkString(type, "Product Type");
     const productTypeCollection = await productType();
     const typesList = await productTypeCollection.find({}).toArray();
 
@@ -105,13 +116,18 @@ module.exports = exportedMethods = {
     return false;
   },
 
-  //ref:https://stackoverflow.com/a/10523963
+  //ref:https://stackoverflow.com/a/10523963 // need to consider type while updating.
   async updateCountOfAPropertyforGivenType(
     type,
     property,
     increaseByOne,
     stock
   ) {
+    errorHandler.checkString(type, "type");
+    errorHandler.checkBoolean(increaseByOne, "IncreaseByOne");
+    errorHandler.checkInt(stock, "Stock");
+    errorHandler.checkProperty(property);
+
     if (increaseByOne) {
       increaseBy = 1 * stock;
     } else {
@@ -130,6 +146,10 @@ module.exports = exportedMethods = {
   },
 
   async updatePropertiesOfProduct(type, property, stock) {
+    errorHandler.checkString(type, "Product type");
+    errorHandler.checkProperty(property);
+    errorHandler.checkInt(stock, "Stock");
+
     const productTypeCollection = await productType();
 
     property["count"] = stock;
@@ -151,6 +171,8 @@ module.exports = exportedMethods = {
   },
 
   async doesPropertyOfProductTypeExist(type, property) {
+    errorHandler.checkString(type, "Product Type");
+    errorHandler.checkProperty(property);
     const productTypeCollection = await productType();
 
     const productTypeDocument = await productTypeCollection.findOne({
@@ -168,13 +190,14 @@ module.exports = exportedMethods = {
   },
 
   async deleteProductPropertiesWithCountZero(type) {
+    errorHandler.checkString(type, "Product Type");
     const productTypeCollection = await productType();
     const updatedInfo = await productTypeCollection.updateOne(
       {
         type: type,
       },
       {
-        $pull: { properties: { count: 0 } }, //{ $lt: 1 }
+        $pull: { properties: { count: { $lt: 1 } } },
       }
     );
     console.log("updated Count :", updatedInfo.updatedCount);
@@ -183,24 +206,47 @@ module.exports = exportedMethods = {
   async deleteProductTypeWithCountZero() {
     const productTypeCollection = await productType();
     const deletedInfo = await productTypeCollection.deleteMany({
-      countOfProducts: 0,
+      countOfProducts: { $lt: 1 },
     });
     console.log("deleted Count :", deletedInfo.deletedCount);
   },
 
   async updateValuesOFAPropertyWithGivenType(type, property) {
+    console.log(property.name, "name");
+    console.log(property.type, "type");
+    console.log(property);
+    errorHandler.checkString(type, "Product Type");
+    errorHandler.checkProperty(property);
     const productTypeCollection = await productType();
     const updatedInfo = await productTypeCollection.updateOne(
       {
         type: type,
-        "properties.name": property.name,
-        "properties.type": property.type,
+        // "properties.name": property.name, //this is not working for multiple conditions.
+        $and: [
+          {
+            properties: {
+              $elemMatch: {
+                name: property.name,
+                type: property.type,
+              },
+            },
+          },
+        ],
       },
+
       {
         $addToSet: {
           "properties.$.values": property.values[0],
         },
       }
+
+      // {
+      //   $set: {
+      //     "properties.$.values": {
+      //       "properties.$.values": property.values[0],
+      //     },
+      //   },
+      // }
     );
 
     console.log(updatedInfo.modifiedCount);
