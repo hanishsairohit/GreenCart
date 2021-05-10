@@ -33,4 +33,4 @@ errorHandler.checkAddress(address);
 
 const property = { name: "weight in lbs", type: "number" };
 
-errorHandler.checkProperty(property);
+errorHandler.checkFilterProperties(property);
