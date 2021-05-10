@@ -40,6 +40,16 @@ router.get("/product/:id", async (req, res) => {
   }
 });
 
+//adding products into the database (admin access only)
+router.post("/", async (req, res) => {
+  const productInfo = req.body;
+  console.log(req.body);
+  if (!productInfo) {
+    res
+      .status(400)
+      .json({ error: "You must provide data to create a Product" });
+    return;
+=======
 router.patch("/product/like/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
