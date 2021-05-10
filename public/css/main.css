@@ -1,66 +1,111 @@
-/* landing page css */
-.navbar{
-    background-color: #000;
-    color: #28a745;
+:root {
+  --input-padding-x: 1.5rem;
+  --input-padding-y: 0.75rem;
+}
+
+.login,
+.image {
+  min-height: 100vh;
+}
+
+.bg-image {
+  background-image: url("https://source.unsplash.com/WEQbe2jBg40/600x1200");
+  background-size: cover;
+  background-position: center;
+}
+
+.login-heading {
+  font-weight: 300;
+}
+
+.btn-login {
+  font-size: 0.9rem;
+  letter-spacing: 0.05rem;
+  padding: 0.75rem 1rem;
+  border-radius: 2rem;
+}
+
+.form-label-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.form-label-group > input,
+.form-label-group > label {
+  padding: var(--input-padding-y) var(--input-padding-x);
+  height: auto;
+  border-radius: 2rem;
+}
+
+.form-label-group > label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  /* Override default `<label>` margin */
+  line-height: 1.5;
+  color: #495057;
+  cursor: text;
+  /* Match the input under the label */
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  transition: all 0.1s ease-in-out;
+}
+
+.form-label-group input::-webkit-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input:-ms-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::-ms-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::-moz-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::placeholder {
+  color: transparent;
+}
+
+.form-label-group input:not(:placeholder-shown) {
+  padding-top: calc(var(--input-padding-y) + var(--input-padding-y) * (2 / 3));
+  padding-bottom: calc(var(--input-padding-y) / 3);
+}
+
+.form-label-group input:not(:placeholder-shown) ~ label {
+  padding-top: calc(var(--input-padding-y) / 3);
+  padding-bottom: calc(var(--input-padding-y) / 3);
+  font-size: 12px;
+  color: #777;
+}
+
+/* Fallback for Edge
+-------------------------------------------------- */
+
+@supports (-ms-ime-align: auto) {
+  .form-label-group > label {
+    display: none;
   }
-
-#navbarNav{
-    margin-left: 75%;
+  .form-label-group input::-ms-input-placeholder {
+    color: #777;
   }
-  .navbar-light .navbar-brand{
-      color: #fff;
-  }  
-  .btn-outline-success{
-      color: #fff;
-      border-color: #fff;
+}
+
+/* Fallback for IE
+-------------------------------------------------- */
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .form-label-group > label {
+    display: none;
   }
-#user_signup{
-    margin-left: 5%;
-}  
-#div_search_bar{
-    width: 70%;
-    background-color: #f5fbf6;
-    margin-left: 15%;
-    padding: 1%;
-}
-#search_bar{
-    width: 90%;
-}
-#search_submit{
-    border-color: #28a745;
-}
-.div_dropdown{
-    padding: 1%;
-    background-color: #deeae0;
-    padding-left: 28%;
-}
-.dropdown-menu.show{
-    position: absolute;
-    /* transform: translate3d(0px, -130px, 0px); */
-    /* top: 0px; */
-    left: 0px;
-    will-change: transform;
-}
-#dropdownMenuLink{
-    background-color: #28a745;
-    /* margin-bottom: 28%; */
-}
-.container{
-    background-color: #dffbaa94;
-    height: 350px;
-    padding-top: 3%;
-    margin-top: 2%;
-}
-
-.home-section--title{
-   font-size: 20px; 
-}
-
-ul {
-    list-style-type: none;
-}
-
-/* css for admin page */
-#add_new_product{
-    padding: 1%;
+  .form-label-group input:-ms-input-placeholder {
+    color: #777;
+  }
 }
