@@ -8,7 +8,7 @@ const constructorMethod = (app) => {
   // app.use("/", (req, res) => {
   //   return res.render("pages/home", { title: "In Home" });
   // });
-  app.use("/", productsRoteus);
+  app.use("/", productsRoutes);
   app.use("/users", userRoutes);
 
 
