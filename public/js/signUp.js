@@ -54,4 +54,4 @@ $(document).ready(function () {
             submitInfo.prop('disabled', false);
         }
     });
-})(JQuery);
+})(jQuery);
