@@ -6,6 +6,12 @@
             </div>
         </div>
         {{!-- --}}
+        {{#if error}}
+        <div>
+            <p> Error: {{error}} </p>
+        </div>
+        {{/if}}
+        {{!--  --}}
         <div class="form-group row">
             <label class="col-form-label col-4">First Name: </label>
             <div class="col-8">

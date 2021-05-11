@@ -207,22 +207,44 @@ router.post("/signup", async (req, res) => {
     return res.json({ errors: "Erros while adding" });
   }
   try {
-    const newUser = await usersData.addUser(
-      firstName,
-      lastName,
-      phoneNumber,
-      email,
-      password,
-      address
-    );
-    console.log(newUser);
-    // req.seesion.user = newUser;
-    //Just for now redirecting to the root route
-    // res.redirect("/");
-
-    return res.render("pages/loginPage", {
-      title: "signIn Done",
+    const allUsers = await usersData.getAllUsers();
+    let emailUsed;
+    allUsers.find((user) => {
+      if (user.emailId === email.toLowerCase()) {
+        emailUsed = true;
+        console.log("adsas");
+        return emailUsed;
+      } else {
+        console.log("nnnn");
+        emailUsed = false;
+        return emailUsed;
+      }
     });
+
+    console.log(emailUsed);
+    if (emailUsed == false) {
+      const newUser = await usersData.addUser(
+        firstName,
+        lastName,
+        phoneNumber,
+        email.toLowerCase(),
+        password,
+        address
+      );
+      console.log(newUser);
+      // req.seesion.user = newUser;
+      //Just for now redirecting to the root route
+      // res.redirect("/");
+
+      return res.render("pages/loginPage", {
+        title: "signIn Done",
+      });
+    } else {
+      return res.render("pages/signUp", {
+        title: "error",
+        error: "Email is already used",
+      });
+    }
   } catch (error) {
     console.log(error);
     return res.json({ message: " error from addUser()" });

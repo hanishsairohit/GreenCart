@@ -20,23 +20,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// product search through search term
-router.get("/:search", async (req, res) => {
-  const searchTerm = req.params.search;
-  if (!searchTerm || searchTerm.trim().length === 0) {
-    console.log(" No search Term Provided (route/products)");
-    throw "Need to provide a search term";
-  }
-  try {
-    const productList = await productsData.searchProduct(searchTerm);
-    console.log(productList);
-    return res.status(200).json({ product: productList });
-  } catch (error) {
-    console.log(error);
-    return res.status(400).json({ message: error });
-  }
-});
-
 // like
 router.patch("/product/like/:id", async (req, res) => {
   try {
@@ -106,5 +89,20 @@ router.post("/", async (req, res) => {
     return res.status(500).json({ error: "Product was not added" });
   }
 });
-
+// product search through search term
+router.get("/search/:search", async (req, res) => {
+  const searchTerm = req.params.search;
+  if (!searchTerm || searchTerm.trim().length === 0) {
+    console.log(" No search Term Provided (route/products)");
+    throw "Need to provide a search term";
+  }
+  try {
+    const productList = await productsData.searchProduct(searchTerm);
+    console.log(productList);
+    return res.status(200).json({ product: productList });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ message: error });
+  }
+});
 module.exports = router;
