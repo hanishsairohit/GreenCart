@@ -8,6 +8,71 @@ const productType = data.productType;
 const errorHandler = require("../Error/DatabaseErrorHandling");
 const { get, route } = require("./users");
 
+router.post("/product", async (req, res) => {
+  const productInfo = req.body;
+
+  productInfo["price"] = parseFloat(productInfo.price);
+  productInfo["stock"] = parseInt(productInfo.stock);
+
+  productInfo["facet"] = [
+    { property: "product_type", value: "plant" },
+    { property: "color", value: "green" },
+  ];
+
+  console.log(productInfo.productImage);
+
+  console.log(productInfo);
+  try {
+    errorHandler.checkObject(productInfo, "Product form data");
+    errorHandler.checkString(productInfo.title, "title");
+    errorHandler.checkString(productInfo.description, "Description");
+    errorHandler.checkString(productInfo.productImage, "Product Image"); //have to check other test cases
+    errorHandler.checkString(productInfo.createdBy, "Created By");
+    errorHandler.checkInt(productInfo.stock, "Stock");
+    errorHandler.checkFacet(productInfo.facet);
+    errorHandler.checkFloat(productInfo.price, "price");
+
+    const {
+      title,
+      description,
+      productImage,
+      createdBy,
+      stock,
+      facet,
+      price,
+    } = productInfo;
+
+    const newProduct = await productsData.addProduct(
+      title,
+      description,
+      productImage,
+      createdBy,
+      stock,
+      facet,
+      price
+    );
+    res.json(newProduct);
+    res.status(200);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Product was not added" });
+  }
+});
+
+router.delete("/product/:id", async (req, res) => {
+  console.log("dhdhd");
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    const product = await productsData.getProductById(req.params.id);
+    await productsData.deleteProduct(req.params.id, product.stock);
+    res.json(product);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
 //to get all products to display on root route
 router.get("/", async (req, res) => {
   try {
@@ -147,59 +212,6 @@ router.get("/search/:searchTerm", async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(400).json({ message: error });
-  }
-});
-
-//to add product to DB Only for admin use
-router.post("/product", async (req, res) => {
-  const productInfo = req.body;
-
-  try {
-    errorHandler.checkObject(productInfo, "Product form data");
-    errorHandler.checkString(productInfo.title, "title");
-    errorHandler.checkString(productInfo.description, "Description");
-    errorHandler.checkString(productInfo.productImage, "Product Image"); //have to check other test cases
-    errorHandler.checkString(productInfo.createdBy, "Created By");
-    errorHandler.checkInt(productInfo.stock, "Stock");
-    errorHandler.checkFacet(productInfo.facet);
-    errorHandler.checkFloat(productInfo.price, "price");
-
-    const {
-      title,
-      description,
-      productImage,
-      createdBy,
-      stock,
-      facet,
-      price,
-    } = productInfo;
-
-    const newProduct = await productsData.addProduct(
-      title,
-      description,
-      productImage,
-      createdBy,
-      stock,
-      facet,
-      price
-    );
-    res.json(newProduct);
-    res.status(200);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Product was not added" });
-  }
-});
-
-router.delete("/product/:id", async (req, res) => {
-  try {
-    errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    const product = await productsData.getProductById(req.params.id);
-    await productsData.deleteProduct(req.params.id, product.stock);
-    res.sendStatus(200);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(404);
   }
 });
 
