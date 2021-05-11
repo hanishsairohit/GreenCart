@@ -1,16 +1,14 @@
-
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const data = require('../data');
+const data = require("../data");
 const adminData = data.admin;
 
-//to get 
-router.get('/', async (req, res) => {
-    try {
-        res.render("pages/admin");
-    } catch (e) {
-      res.sendStatus(400);
-    }
-  });
+router.get("/", async (req, res) => {
+  try {
+    res.render("pages/admin");
+  } catch (e) {
+    res.sendStatus(400);
+  }
+});
 
-  module.exports = router;
+module.exports = router;

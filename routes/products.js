@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-//to get product by Id provided
+22; //to get product by Id provided
 router.get("/product/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
@@ -49,7 +49,9 @@ router.post("/", async (req, res) => {
       .status(400)
       .json({ error: "You must provide data to create a Product" });
     return;
-=======
+  }
+});
+
 router.patch("/product/like/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
