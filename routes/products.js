@@ -92,7 +92,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-//to get product by Id provided
+22; //to get product by Id provided
 router.get("/product/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
@@ -118,6 +118,7 @@ router.post("/", async (req, res) => {
     return;
   }
 });
+
 router.patch("/product/like/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");

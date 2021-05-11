@@ -1,9 +1,9 @@
-
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const data = require('../data');
+const data = require("../data");
 const adminData = data.admin;
 const productsData = data.products;
+
 
 //to get all products to display on root route
 router.get("/", async (req, res) => {
@@ -34,4 +34,4 @@ router.get("/", async (req, res) => {
 
 //   });
 
-  module.exports = router;
+module.exports = router;
