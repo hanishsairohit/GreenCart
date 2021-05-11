@@ -1,12 +1,12 @@
 const express = require("express");
+const { reset } = require("nodemon");
 const router = express.Router();
 const data = require("../data");
 const productsData = data.products;
 const commentsData = data.comments;
 const productType = data.productType;
-
+const usersData = data.users;
 const errorHandler = require("../Error/DatabaseErrorHandling");
-const { get, route } = require("./users");
 
 router.post("/product", async (req, res) => {
   const productInfo = req.body;
@@ -14,15 +14,29 @@ router.post("/product", async (req, res) => {
   productInfo["price"] = parseFloat(productInfo.price);
   productInfo["stock"] = parseInt(productInfo.stock);
 
-  productInfo["facet"] = [
-    { property: "product_type", value: "plant" },
-    { property: "color", value: "green" },
-  ];
+  // productInfo["facet"] = [
+  //   { property: "product_type", value: "plant" },
+  //   { property: "color", value: "green" },
+  // ];
+
+  for (i of productInfo.facet) {
+    if (!isNaN(parseFloat(i.value))) {
+      i.value = parseFloat(i.value);
+    }
+  }
 
   console.log(productInfo.productImage);
 
   console.log(productInfo);
   try {
+    if (isNaN(productInfo["stock"])) {
+      throw "Please enter a valid stock value";
+    }
+
+    if (isNaN(productInfo["price"])) {
+      throw "Please enter a valid price";
+    }
+
     errorHandler.checkObject(productInfo, "Product form data");
     errorHandler.checkString(productInfo.title, "title");
     errorHandler.checkString(productInfo.description, "Description");
@@ -55,7 +69,7 @@ router.post("/product", async (req, res) => {
     res.status(200);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Product was not added" });
+    res.sendStatus(404);
   }
 });
 
@@ -66,7 +80,6 @@ router.delete("/product/:id", async (req, res) => {
     const product = await productsData.getProductById(req.params.id);
     await productsData.deleteProduct(req.params.id, product.stock);
     res.json(product);
-    res.sendStatus(200);
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
@@ -90,8 +103,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-22; //to get product by Id provided
-router.get("/product/:id", async (req, res) => {
+//to get product by Id provided
+router.get("/products/product/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     let product = await productsData.getProductById(req.params.id);
@@ -120,8 +133,63 @@ router.post("/", async (req, res) => {
 router.patch("/product/like/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    await productsData.addLike(req.params.id, "6096ea6fb548d9936bc7c9bd");
+    if (req.session.user) {
+      await productsData.addLike(req.params.id, req.session.user._id);
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+router.patch("/product/dislike/:id", async (req, res) => {
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    if (req.session.user) {
+      await productsData.addDisLike(req.params.id, req.session.user._id);
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.patch("/product/comment/:id", async (req, res) => {
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+
+    await commentsData.addComment(
+      req.session.user._id,
+      req.params.id,
+      "This product is so good"
+    );
     res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.get("/buy", async (req, res) => {
+  try {
+    if (req.session.user) {
+      let unique = req.session.cartItems.filter(
+        (v, i, a) => a.indexOf(v) === i
+      );
+
+      for (i of unique) {
+        await usersData.userPurchasesAProduct(req.session.user._id, i);
+      }
+      req.session.cartItems = [];
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
@@ -143,25 +211,39 @@ router.patch("/product/comment/:id", async (req, res) => {
   }
 });
 
-router.patch("/product/comment/:id", async (req, res) => {
+router.get("/addtocart/:id", async (req, res) => {
   try {
+    console.log("rfdsx");
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    await commentsData.addComment(
-      "6096ea6fb548d9936bc7c9bd",
-      req.params.id,
-      "This product is so good"
-    );
-    res.sendStatus(200);
+    if (req.session.user) {
+      console.log(req.session);
+      req.session.cartItems.push(req.params.id);
+      res.sendStatus(200);
+    } else {
+      console.log("fdscxz");
+      res.sendStatus(404);
+    }
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
   }
 });
 
-router.patch("/product/addtocart/:id", async (req, res) => {
+router.get("/cart/", async (req, res) => {
   try {
-    errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    res.sendStatus(200);
+    if (req.session.user) {
+      const productsList = [];
+      let unique = req.session.cartItems.filter(
+        (v, i, a) => a.indexOf(v) === i
+      );
+
+      for (i of unique) {
+        productsList.push(await productsData.getProductById(i));
+      }
+      res.json(productsList);
+    } else {
+      res.sendStatus(404);
+    }
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
