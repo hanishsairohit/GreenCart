@@ -106,12 +106,17 @@ router.get("/", async (req, res) => {
 //to get product by Id provided
 router.get("/products/product/:id", async (req, res) => {
   try {
-    errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    let product = await productsData.getProductById(req.params.id);
-    res.render("pages/singleProduct", {
-      title: product.title,
-      product: product,
-    });
+    if (req.session.user) {
+      errorHandler.checkStringObjectId(req.params.id, "Product ID");
+      let product = await productsData.getProductById(req.params.id);
+      await usersData.userViewsAProduct(req.session.user._id, req.params.id);
+      res.render("pages/singleProduct", {
+        title: product.title,
+        product: product,
+      });
+    } else {
+      res.sendStatus(404).json({ message: "User not Authenticated" });
+    }
   } catch (e) {
     console.log(e);
     res.status(404).json({ error: "Product not found" });
@@ -160,15 +165,20 @@ router.patch("/product/dislike/:id", async (req, res) => {
 });
 
 router.patch("/product/comment/:id", async (req, res) => {
+  const comment_text = req.body;
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
-
-    await commentsData.addComment(
-      req.session.user._id,
-      req.params.id,
-      "This product is so good"
-    );
-    res.sendStatus(200);
+    errorHandler.checkString(req.body);
+    if (req.session.user) {
+      await commentsData.addComment(
+        req.session.user._id,
+        req.params.id,
+        comment_text
+      );
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
@@ -272,12 +282,15 @@ router.get("/properties/:type", async (req, res) => {
     const result = [];
     for (type of types) {
       if (type.type == req.params.type) {
-        result.push();
+        for (prop of type.properties) {
+          const { name, type } = prop;
+          result.push({ name, type });
+        }
+        res.json(result);
+        return;
       }
-      result.push(type.type);
     }
-    res.status(200);
-    res.json(result);
+    res.sendStatus(404);
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
