@@ -33,7 +33,7 @@ $(document).ready(function () {
         let info = {
             firstName: firstNameInput.val().trim(),
             lastName: lastNameInput.val().trim(),
-            phoneNumber: PhoneNumberInput.val().trim(),
+            phoneNumber: phoneNumberInput.val().trim(),
             email: emailInput.val().trim(),
             password: passwordInput.val().trim(),
             address: addressInput.val().trim()
