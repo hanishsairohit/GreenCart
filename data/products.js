@@ -38,6 +38,7 @@ let exportedMethods = {
         createdAt,
         stock,
         facet,
+        price,
       } = product;
       _id = _id.toString();
       result.push({
@@ -49,6 +50,7 @@ let exportedMethods = {
         createdAt,
         stock,
         facet,
+        price,
       });
     }
     return result;

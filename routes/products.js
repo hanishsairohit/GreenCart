@@ -61,7 +61,7 @@ router.post("/product", async (req, res) => {
 });
 
 router.delete("/product/:id", async (req, res) => {
-  console.log('dhdhd');
+  
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     const product = await productsData.getProductById(req.params.id);
@@ -82,6 +82,7 @@ router.get("/", async (req, res) => {
     if (productList.length > 0) {
       hasProduct = true;
     }
+    
     return res.render("pages/home", {
       title: "All Product List",
       productList: productList,
@@ -94,6 +95,7 @@ router.get("/", async (req, res) => {
 
 //to get product by Id provided
 router.get("/product/:id", async (req, res) => {
+  console.log(req.params.id);
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     let product = await productsData.getProductById(req.params.id);
