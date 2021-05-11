@@ -1,7 +1,90 @@
 const express = require("express");
+const { reset } = require("nodemon");
 const router = express.Router();
 const data = require("../data");
 const productsData = data.products;
+const commentsData = data.comments;
+const productType = data.productType;
+const usersData = data.users;
+const errorHandler = require("../Error/DatabaseErrorHandling");
+
+router.post("/product", async (req, res) => {
+  const productInfo = req.body;
+
+  productInfo["price"] = parseFloat(productInfo.price);
+  productInfo["stock"] = parseInt(productInfo.stock);
+
+  // productInfo["facet"] = [
+  //   { property: "product_type", value: "plant" },
+  //   { property: "color", value: "green" },
+  // ];
+
+  for (i of productInfo.facet) {
+    if (!isNaN(parseFloat(i.value))) {
+      i.value = parseFloat(i.value);
+    }
+  }
+
+  console.log(productInfo.productImage);
+
+  console.log(productInfo);
+  try {
+    if (isNaN(productInfo["stock"])) {
+      throw "Please enter a valid stock value";
+    }
+
+    if (isNaN(productInfo["price"])) {
+      throw "Please enter a valid price";
+    }
+
+    errorHandler.checkObject(productInfo, "Product form data");
+    errorHandler.checkString(productInfo.title, "title");
+    errorHandler.checkString(productInfo.description, "Description");
+    errorHandler.checkString(productInfo.productImage, "Product Image"); //have to check other test cases
+    errorHandler.checkString(productInfo.createdBy, "Created By");
+    errorHandler.checkInt(productInfo.stock, "Stock");
+    errorHandler.checkFacet(productInfo.facet);
+    errorHandler.checkFloat(productInfo.price, "price");
+
+    const {
+      title,
+      description,
+      productImage,
+      createdBy,
+      stock,
+      facet,
+      price,
+    } = productInfo;
+
+    const newProduct = await productsData.addProduct(
+      title,
+      description,
+      productImage,
+      createdBy,
+      stock,
+      facet,
+      price
+    );
+    res.json(newProduct);
+    res.status(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.delete("/product/:id", async (req, res) => {
+  console.log("dhdhd");
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    const product = await productsData.getProductById(req.params.id);
+    await productsData.deleteProduct(req.params.id, product.stock);
+    res.json(product);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
 
 //to get all products to display on root route
 router.get("/", async (req, res) => {
@@ -20,37 +103,27 @@ router.get("/", async (req, res) => {
   }
 });
 
-// product search through search term
-router.get("/:search", async (req, res) => {
-  const searchTerm = req.params.search;
-  if (!searchTerm || searchTerm.trim().length === 0) {
-    console.log(" No search Term Provided (route/products)");
-    throw "Need to provide a search term";
-  }
-  try {
-    const productList = await productsData.searchProduct(searchTerm);
-    console.log(productList);
-    return res.status(200).json({ product: productList });
-  } catch (error) {
-    console.log(error);
-    return res.status(400).json({ message: error });
-  }
-});
-
 //to get product by Id provided
-router.get("/product/:id", async (req, res) => {
+router.get("/products/product/:id", async (req, res) => {
   try {
-    let product = await productsData.getProductById(req.params.id);
-    return res.render("pages/singleProduct", {
-      title: product.title,
-      product: product,
-    });
+    if (req.session.user) {
+      errorHandler.checkStringObjectId(req.params.id, "Product ID");
+      let product = await productsData.getProductById(req.params.id);
+      await usersData.userViewsAProduct(req.session.user._id, req.params.id);
+      res.render("pages/singleProduct", {
+        title: product.title,
+        product: product,
+      });
+    } else {
+      res.sendStatus(404).json({ message: "User not Authenticated" });
+    }
   } catch (e) {
-    return res.status(404).json({ error: "product not found" });
+    console.log(e);
+    res.status(404).json({ error: "Product not found" });
   }
 });
 
-//to add product to DB Only for admin use
+//adding products into the database (admin access only)
 router.post("/", async (req, res) => {
   const productInfo = req.body;
   console.log(req.body);
@@ -60,38 +133,180 @@ router.post("/", async (req, res) => {
       .json({ error: "You must provide data to create a Product" });
     return;
   }
+});
 
-  if (!productInfo.title) {
-    res.status(400).json({ error: "You must provide a title" });
-    return;
-  }
-
+router.patch("/product/like/:id", async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      productImage,
-      noOfLikes,
-      comments,
-      likedBy,
-      createdBy,
-      createdAt,
-    } = productInfo;
-    const newProduct = await productsData.addProducts(
-      title,
-      description,
-      productImage,
-      noOfLikes,
-      comments,
-      likedBy,
-      createdBy,
-      createdAt
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    if (req.session.user) {
+      await productsData.addLike(req.params.id, req.session.user._id);
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+router.patch("/product/dislike/:id", async (req, res) => {
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    if (req.session.user) {
+      await productsData.addDisLike(req.params.id, req.session.user._id);
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.patch("/product/comment/:id", async (req, res) => {
+  const comment_text = req.body;
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    errorHandler.checkString(req.body);
+    if (req.session.user) {
+      await commentsData.addComment(
+        req.session.user._id,
+        req.params.id,
+        comment_text
+      );
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.get("/buy", async (req, res) => {
+  try {
+    if (req.session.user) {
+      let unique = req.session.cartItems.filter(
+        (v, i, a) => a.indexOf(v) === i
+      );
+
+      for (i of unique) {
+        await usersData.userPurchasesAProduct(req.session.user._id, i);
+      }
+      req.session.cartItems = [];
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.patch("/product/comment/:id", async (req, res) => {
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    await commentsData.addComment(
+      "6096ea6fb548d9936bc7c9bd",
+      req.params.id,
+      "This product is so good"
     );
-    res.json(newProduct);
-    return res.sendStatus(200);
-  } catch (e) {
-    console.log(e);
-    return res.status(500).json({ error: "Product was not added" });
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.get("/addtocart/:id", async (req, res) => {
+  try {
+    console.log("rfdsx");
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    if (req.session.user) {
+      console.log(req.session);
+      req.session.cartItems.push(req.params.id);
+      res.sendStatus(200);
+    } else {
+      console.log("fdscxz");
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.get("/cart/", async (req, res) => {
+  try {
+    if (req.session.user) {
+      const productsList = [];
+      let unique = req.session.cartItems.filter(
+        (v, i, a) => a.indexOf(v) === i
+      );
+
+      for (i of unique) {
+        productsList.push(await productsData.getProductById(i));
+      }
+      res.json(productsList);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.get("/producttypes", async (req, res) => {
+  try {
+    const types = await productType.getProductTypes();
+    const result = [];
+    for (type of types) {
+      result.push(type.type);
+    }
+    res.status(200);
+    res.json(result);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.get("/properties/:type", async (req, res) => {
+  try {
+    errorHandler.checkString(req.params.type);
+    const types = await productType.getProductTypes();
+    const result = [];
+    for (type of types) {
+      if (type.type == req.params.type) {
+        for (prop of type.properties) {
+          const { name, type } = prop;
+          result.push({ name, type });
+        }
+        res.json(result);
+        return;
+      }
+    }
+    res.sendStatus(404);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
+router.get("/search/:searchTerm", async (req, res) => {
+  const searchTerm = req.params.searchTerm;
+  try {
+    errorHandler.checkString(searchTerm);
+    const productList = await productsData.searchProduct(searchTerm);
+    console.log(productList);
+    return res.status(200).json({ product: productList });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ message: error });
   }
 });
 
