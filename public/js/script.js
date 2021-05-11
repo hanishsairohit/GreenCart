@@ -16,7 +16,7 @@ $(document).ready(function() {
         })
     });
 
-    $('#delete_product').on('click', function(e) {
+    $('.delete_product').on('click', function(e) {
         var id = $(this).attr('data-id');
         alert(id);
         $.ajax({
