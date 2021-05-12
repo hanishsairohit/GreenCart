@@ -1,36 +1,36 @@
 <h1>{{userInfo.firstName}} {{userInfo.lastName}}</h1>
 
-
-<h2>Purchase History</h2>
-
-<ul>
+<div class="container">
+  <h2>Purchase History</h2>
+  <ul>
     {{#each purchase}}
-    <li><a href="/product/{{this._id}}">{{this.title}}</a></li>
+      <li
+        class="list-group-item d-flex justify-content-between align-items-start text-primary"
+      ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
     {{/each}}
-</ul>
+  </ul>
 
+  <h2>Comments</h2>
 
-
-<h2>Comments</h2>
-
-<ul>
+  <ul>
     {{#each comments}}
-    <li><a href="/product/{{this.productId}}">{{this.commentText}}</a></li>
+      <li
+        class="list-group-item d-flex justify-content-between align-items-start text-primary"
+      ><a
+          href="/products/product/{{this.productId}}"
+        >{{this.commentText}}</a></li>
     {{/each}}
-</ul>
+  </ul>
 
+  <h2>Viewd Products</h2>
 
-
-
-<h2>Viewd Products</h2>
-
-<ul>
+  <ul>
     {{#each viewdProduct}}
-    <li><a href="/product/{{this._id}}">{{this.title}}</a></li>
+      <li
+        class="list-group-item d-flex justify-content-between align-items-start text-primary"
+      ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
 
     {{/each}}
-</ul>
-
-
-
-<a href="/users/logout"> Click to logout </a>
+  </ul>
+</div>
+<a class="btn btn-danger" href="/users/logout">Logout </a>

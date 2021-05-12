@@ -39,6 +39,20 @@ module.exports = {
     return insertedInfo.insertedId.toString();
   },
 
+  async getAllAdmins() {
+    const adminCollection = await admin();
+    const allAdmins = await adminCollection.find({}).toArray();
+    if (!allAdmins || allAdmins.length == 0) {
+      console.log("admin collection is empty");
+      return;
+    } else {
+      for (i of allAdmins) {
+        i._id = i._id.toString();
+      }
+      return allAdmins;
+    }
+  },
+
   async getAdmin(adminId) {
     errorHandler.checkStringObjectId(adminId, "Admin Id");
     const adminCollection = await admin();

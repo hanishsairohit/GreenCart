@@ -22,6 +22,14 @@ app.use(
 );
 
 //MIDDLEWARES
+//admin access middleware
+app.use("/admin", async (req, res, next) => {
+  if (req.session.admin) {
+    next();
+  } else {
+    return res.redirect("/");
+  }
+});
 
 // Terminate acess if user is not logged in.
 app.use("/users/details", async (req, res, next) => {

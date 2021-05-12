@@ -147,6 +147,25 @@ module.exports = {
     if (updatedInfo.updatedCount === 0)
       throw "Update failed to add like info to user collection!";
   },
+  async userDisLikesAProduct(UserID, ProductID) {
+    errorHandler.checkStringObjectId(UserID, "User ID");
+    errorHandler.checkStringObjectId(ProductID, "Product ID");
+    const usersCollection = await users();
+
+    const updatedInfo = await usersCollection.updateOne(
+      {
+        _id: ObjectId(UserID),
+      },
+      {
+        $pull: {
+          LikeHistory: ObjectId(ProductID),
+        },
+      }
+    );
+
+    if (updatedInfo.updatedCount === 0)
+      throw "Update failed to add dislike info to user collection!";
+  },
 
   async getUserLikedProducts(UserID) {
     errorHandler.checkStringObjectId(UserID, "User ID");
@@ -209,6 +228,7 @@ module.exports = {
     const user = await this.getUser(UserID);
 
     const productsList = [];
+
     for (productID of user.viewHistory) {
       productsList.push(await products.getProductById(productID.toString()));
     }

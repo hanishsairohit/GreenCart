@@ -110,77 +110,73 @@
   }
 }
 
-.form-control {
-  border-color: #eee;
-  min-height: 41px;
-  box-shadow: none !important;
+/* landing page css */
+.navbar {
+  background-color: #000;
+  color: #28a745;
 }
-.form-control:focus {
-  border-color: #5cd3b4;
+
+#navbarNav {
+  margin-left: 75%;
 }
-.form-control,
-.btn {
-  border-radius: 3px;
+.navbar-light .navbar-brand {
+  color: #fff;
 }
-.signup-form {
-  width: 500px;
-  margin: 0 auto;
-  padding: 30px 0;
+.btn-outline-success {
+  color: #fff;
+  border-color: #fff;
 }
-.signup-form h2 {
-  color: #333;
-  margin: 0 0 30px 0;
-  display: inline-block;
-  padding: 0 30px 10px 0;
-  border-bottom: 3px solid #5cd3b4;
+#user_signup {
+  margin-left: 5%;
 }
-.signup-form form {
-  color: #999;
-  border-radius: 3px;
-  margin-bottom: 15px;
-  background: #fff;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  padding: 30px;
+#div_search_bar {
+  width: 70%;
+  background-color: #f5fbf6;
+  margin-left: 15%;
+  padding: 1%;
 }
-.signup-form .form-group row {
-  margin-bottom: 20px;
+#search_bar {
+  width: 90%;
 }
-.signup-form label {
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 2;
+#search_submit {
+  border-color: #28a745;
 }
-.signup-form input[type="checkbox"] {
-  position: relative;
-  top: 1px;
+.div_dropdown {
+  padding: 1%;
+  background-color: #deeae0;
+  padding-left: 28%;
 }
-.signup-form .btn {
-  font-size: 16px;
-  font-weight: bold;
-  background: #5cd3b4;
-  border: none;
-  margin-top: 20px;
-  min-width: 140px;
+.dropdown-menu.show {
+  position: absolute;
+  /* transform: translate3d(0px, -130px, 0px); */
+  /* top: 0px; */
+  left: 0px;
+  will-change: transform;
 }
-.signup-form .btn:hover,
-.signup-form .btn:focus {
-  background: #41cba9;
-  outline: none !important;
+#dropdownMenuLink {
+  background-color: #28a745;
+  /* margin-bottom: 28%; */
 }
-.signup-form a {
-  color: #5cd3b4;
-  text-decoration: underline;
+/* .container {
+  /* background-color: #dffbaa94; */
+/* height: 350px; */
+/* padding-top: 3%; */
+/* margin-top: 2%; */
+/* } */
+
+.home-section--title {
+  font-size: 20px;
 }
-.signup-form a:hover {
-  text-decoration: none;
+
+ul {
+  list-style-type: none;
 }
-.signup-form form a {
-  color: #5cd3b4;
-  text-decoration: none;
+
+/* css for admin page */
+#add_new_product {
+  padding: 1%;
 }
-.signup-form form a:hover {
-  text-decoration: underline;
-}
+
 /* css for single product page */
 .location {
   padding: 1%;
@@ -207,5 +203,13 @@
   margin-top: 2%;
 }
 .modal-body {
-  height: 450px;
+  height: auto;
+}
+
+.leftContainer {
+  float: left;
+}
+
+.rightContainer {
+  float: right;
 }
