@@ -39,31 +39,43 @@ router.get("/", async (req, res) => {
 // Users Details Pages
 router.get("/details", async (req, res) => {
   console.log(req.session.user);
-  if (req.session.user) {
-    const userInfo = await usersData.getUser(req.session.user._id);
-    const userComments = await usersData.getUserComments(req.session.user._id);
-    // const userLikes = await usersData.getUserLikedProducts(req.params.id);
-    const userViewedProduct = await usersData.getUserViewedProdcuts(
-      req.session.user._id
-    );
-    const userBoughtProducts = await usersData.getUserBoughtProducts(
-      req.session.user._id
-    );
 
-    return res.render("pages/userDetail", {
-      title: "User Info page",
-      userInfo: userInfo,
-      comments: userComments,
-      // likes: userLikes,
-      viewdProduct: userViewedProduct,
-      purchase: userBoughtProducts,
-    });
-  } else {
-    return res.json({ message: "Not  signedIn" });
+  try {
+    if (req.session.user) {
+      const userInfo = await usersData.getUser(req.session.user._id);
+      console.log("fdsc");
+      const userComments = await usersData.getUserComments(
+        req.session.user._id
+      );
+      console.log("rfeds");
+      // const userLikes = await usersData.getUserLikedProducts(req.params.id);
+      const userViewedProduct = await usersData.getUserViewedProdcuts(
+        req.session.user._id
+      );
+      console.log("fds");
+      const userBoughtProducts = await usersData.getUserBoughtProducts(
+        req.session.user._id
+      );
+      console.log("fr");
+
+      return res.render("pages/userDetail", {
+        title: "User Info page",
+        userInfo: userInfo,
+        comments: userComments,
+        // likes: userLikes,
+        viewdProduct: userViewedProduct,
+        purchase: userBoughtProducts,
+      });
+    } else {
+      return res.json({ message: "Not  signedIn" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/user/:id", async (req, res) => {
   try {
     const userInfo = await usersData.getUser(req.params.id);
     res.json(userInfo);
@@ -135,6 +147,7 @@ router.post("/login", async (req, res) => {
       // let comp = req.session.previousRoute;
       // if (comp) {
       req.session.previousRoute = "";
+      req.session.cartItems = [];
       return res.redirect("/users/details");
       // }
       // return res.redirect("/products");

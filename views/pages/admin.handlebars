@@ -38,13 +38,15 @@
                             <input type="number" name="price" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label for="type">Type</label>
-                            <input type="text" name="type" class="form-control">
+                            <label for="product_type">Product Type</label>
+                            <input type="text" name="product_type" class="form-control">
                         </div>
-                        <div class="form-group">
-                            <label for="color">Color</label>
-                            <input type="text" name="color" class="form-control">
+
+                         <div id="properties">
+
                         </div>
+
+                        <button type="button" class="btn btn-primary" id="add_property">Add Property</button>
                        
                         					
                     </div>
@@ -52,6 +54,7 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="button" class="btn btn-primary" id="add_product_sub">Add Product</button>
                     </div>
+                    <div id="error_msg"></div>
                 </form>
                 </div>
             </div>
@@ -77,7 +80,10 @@
 			<td>{{this.stock}}</td>
             <td><button type="button" class="btn btn-danger delete_product" data-id="{{this._id}}">Delete</button></td>
 		</tr>
+
+		
         {{/each}}
+
 	
 	</tbody>
     </table>

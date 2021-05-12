@@ -111,61 +111,61 @@
 }
 
 /* landing page css */
-.navbar{
+.navbar {
   background-color: #000;
   color: #28a745;
 }
 
-#navbarNav{
+#navbarNav {
   margin-left: 75%;
 }
-.navbar-light .navbar-brand{
-    color: #fff;
-}  
-.btn-outline-success{
-    color: #fff;
-    border-color: #fff;
+.navbar-light .navbar-brand {
+  color: #fff;
 }
-#user_signup{
+.btn-outline-success {
+  color: #fff;
+  border-color: #fff;
+}
+#user_signup {
   margin-left: 5%;
-}  
-#div_search_bar{
+}
+#div_search_bar {
   width: 70%;
   background-color: #f5fbf6;
   margin-left: 15%;
   padding: 1%;
 }
-#search_bar{
+#search_bar {
   width: 90%;
 }
-#search_submit{
+#search_submit {
   border-color: #28a745;
 }
-.div_dropdown{
+.div_dropdown {
   padding: 1%;
   background-color: #deeae0;
   padding-left: 28%;
 }
-.dropdown-menu.show{
+.dropdown-menu.show {
   position: absolute;
   /* transform: translate3d(0px, -130px, 0px); */
   /* top: 0px; */
   left: 0px;
   will-change: transform;
 }
-#dropdownMenuLink{
+#dropdownMenuLink {
   background-color: #28a745;
   /* margin-bottom: 28%; */
 }
-.container{
+.container {
   background-color: #dffbaa94;
   height: 350px;
   padding-top: 3%;
   margin-top: 2%;
 }
 
-.home-section--title{
- font-size: 20px; 
+.home-section--title {
+  font-size: 20px;
 }
 
 ul {
@@ -173,35 +173,43 @@ ul {
 }
 
 /* css for admin page */
-#add_new_product{
+#add_new_product {
   padding: 1%;
 }
 
 /* css for single product page */
-.location{
+.location {
   padding: 1%;
 }
-#single_prod_section{
-  color:gray;
+#single_prod_section {
+  color: gray;
   text-align: center;
 }
-.single_h3{
+.single_h3 {
   font-weight: bold;
 }
-#review_post{
+#review_post {
   margin-right: 100px;
 }
 
-#single_extra{
+#single_extra {
   background-color: #c7f575;
   padding: 2%;
 }
-#cart_container{
+#cart_container {
   background-color: #dffbaa94;
   height: auto;
   padding-top: 2%;
   margin-top: 2%;
 }
-.modal-body{
+.modal-body {
   height: auto;
+}
+
+.leftContainer {
+  float: left;
+}
+
+.rightContainer {
+  float: right;
 }
