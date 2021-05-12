@@ -283,8 +283,8 @@ router.get("/properties/:type", async (req, res) => {
     for (type of types) {
       if (type.type == req.params.type) {
         for (prop of type.properties) {
-          const { name, type } = prop;
-          result.push({ name, type });
+          const { name, type, values } = prop;
+          result.push({ name, type, values });
         }
         res.json(result);
         return;
@@ -302,6 +302,19 @@ router.get("/search/:searchTerm", async (req, res) => {
   try {
     errorHandler.checkString(searchTerm);
     const productList = await productsData.searchProduct(searchTerm);
+    console.log(productList);
+    return res.status(200).json({ product: productList });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ message: error });
+  }
+});
+
+router.post("/filter", async (req, res) => {
+  const filterProp = req.body;
+  try {
+    errorHandler.checkFilterProperties(filterProp);
+    const productList = await productsData.filterProducts(filterProp);
     console.log(productList);
     return res.status(200).json({ product: productList });
   } catch (error) {
