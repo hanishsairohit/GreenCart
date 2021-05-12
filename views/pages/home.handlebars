@@ -1,11 +1,17 @@
 <div id="div_search_bar">
-  <form class="form-inline my-2 my-lg-0">
+  <form
+    class="form-inline my-2 my-lg-0"
+    id="searchForm"
+    action="/search"
+    method="POST"
+  >
     <input
       id="search_bar"
       class="form-control mr-sm-2"
       type="search"
       placeholder="Search"
       aria-label="Search"
+      name="searchTerm"
     />
     <button
       id="search_submit"

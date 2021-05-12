@@ -307,13 +307,21 @@ router.get("/properties/:type", async (req, res) => {
   }
 });
 
-router.get("/search/:searchTerm", async (req, res) => {
-  const searchTerm = req.params.searchTerm;
+router.post("/search", async (req, res) => {
+  console.log("hello");
+  const searchTerm = req.body.searchTerm;
   try {
     errorHandler.checkString(searchTerm);
     const productList = await productsData.searchProduct(searchTerm);
-    console.log(productList);
-    return res.status(200).json({ product: productList });
+
+    if (productList.length > 0) {
+      hasProduct = true;
+    }
+    return res.render("pages/home", {
+      title: "All Product List",
+      productList: productList,
+      hasProduct: hasProduct,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ message: error });

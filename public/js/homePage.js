@@ -2,6 +2,7 @@ $(document).ready(function () {
   const productTypes_dropdown = $("#displayProp");
   const filterDiv = $("#filterDiv");
 
+  //ref:https://stackoverflow.com/questions/5524045/jquery-non-ajax-post
   function submit(action, method, values) {
     var form = $("<form/>", {
       action: action,
@@ -19,15 +20,6 @@ $(document).ready(function () {
     form.appendTo("body").submit();
   }
 
-  function objectifyForm(formArray) {
-    //serialize data function
-    var returnArray = {};
-    for (var i = 0; i < formArray.length; i++) {
-      returnArray[formArray[i]["name"]] = formArray[i]["value"];
-    }
-    return returnArray;
-  }
-
   $.ajax({
     url: "/producttypes",
     type: "GET",
@@ -43,6 +35,11 @@ $(document).ready(function () {
     error: function () {
       console.log("fdcsxz");
     },
+  });
+
+  $(document).on("click", "#search_submit", function (e) {
+    const searchTerm = $("#search_bar").val();
+    submit(`/search/${searchTerm}`, "GET", []);
   });
 
   $(document).on("click", ".dropdown-item", function (e) {
@@ -104,5 +101,12 @@ $(document).ready(function () {
     }
     console.log(updatedData);
     submit("/filter", "POST", updatedData);
+  });
+
+  $(document).on("click", "#search_submit", function () {
+    console.log("frnm d");
+    const searchTerm = $("#search_bar").val();
+    console.log(searchTerm);
+    submit(`/search/${searchTerm}`, "GET", [{ name: "d", value: "csx" }]);
   });
 });
