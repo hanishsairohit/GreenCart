@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const data = require("../data");
 const productsData = data.products;
+
 const commentsData = data.comments;
 const productType = data.productType;
 
@@ -32,16 +33,8 @@ router.post("/product", async (req, res) => {
     errorHandler.checkFacet(productInfo.facet);
     errorHandler.checkFloat(productInfo.price, "price");
 
-
-    const {
-      title,
-      description,
-      productImage,
-      createdBy,
-      stock,
-      facet,
-      price,
-    } = productInfo;
+    const { title, description, productImage, createdBy, stock, facet, price } =
+      productInfo;
 
     const newProduct = await productsData.addProduct(
       title,
@@ -81,7 +74,7 @@ router.get("/", async (req, res) => {
     if (productList.length > 0) {
       hasProduct = true;
     }
-    
+
     return res.render("pages/home", {
       title: "All Product List",
       productList: productList,
@@ -92,18 +85,40 @@ router.get("/", async (req, res) => {
   }
 });
 
+// like
+router.patch("/product/like/:id", async (req, res) => {
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    await productsData.addLike(req.params.id, "6096ea6fb548d9936bc7c9bd");
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
 //to get product by Id provided
 router.get("/products/product/:id", async (req, res) => {
   try {
+
+    // if (req.session.user) {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     let product = await productsData.getProductById(req.params.id);
+    console.log(product);
+    await usersData.userViewsAProduct(
+      "609a2fca59ef0ecfeb7b57af",
+      req.params.id
+    );
     res.render("pages/singleProduct", {
       title: product.title,
       product: product,
     });
+
+    // } else {
+    //   res.sendStatus(404).json({ message: "User not Authenticated" });
+    // }
   } catch (e) {
-    console.log(e);
-    res.status(404).json({ error: "Product not found" });
+    return res.status(404).json({ error: "product not found" });
   }
 });
 
@@ -195,13 +210,21 @@ router.get("/properties/:type", async (req, res) => {
   }
 });
 
-router.get("/search/:searchTerm", async (req, res) => {
-  const searchTerm = req.params.searchTerm;
+router.post("/search", async (req, res) => {
+  console.log("hello");
+  const searchTerm = req.body.searchTerm;
   try {
     errorHandler.checkString(searchTerm);
     const productList = await productsData.searchProduct(searchTerm);
-    console.log(productList);
-    return res.status(200).json({ product: productList });
+
+    if (productList.length > 0) {
+      hasProduct = true;
+    }
+    return res.render("pages/home", {
+      title: "All Product List",
+      productList: productList,
+      hasProduct: hasProduct,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ message: error });
@@ -213,8 +236,16 @@ router.post("/filter", async (req, res) => {
   try {
     errorHandler.checkFilterProperties(filterProp);
     const productList = await productsData.filterProducts(filterProp);
-    console.log(productList);
-    return res.status(200).json({ product: productList });
+
+    if (productList.length > 0) {
+      hasProduct = true;
+    }
+
+    return res.render("pages/home", {
+      title: "All Product List",
+      productList: productList,
+      hasProduct: hasProduct,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ message: error });
