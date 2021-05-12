@@ -2,13 +2,22 @@ $(document).ready(function () {
   const productTypes_dropdown = $("#displayProp");
   const filterDiv = $("#filterDiv");
 
-  function objectifyForm(formArray) {
-    //serialize data function
-    var returnArray = {};
-    for (var i = 0; i < formArray.length; i++) {
-      returnArray[formArray[i]["name"]] = formArray[i]["value"];
-    }
-    return returnArray;
+  //ref:https://stackoverflow.com/questions/5524045/jquery-non-ajax-post
+  function submit(action, method, values) {
+    var form = $("<form/>", {
+      action: action,
+      method: method,
+    });
+    $.each(values, function () {
+      form.append(
+        $("<input/>", {
+          type: "hidden",
+          name: this.name,
+          value: this.value,
+        })
+      );
+    });
+    form.appendTo("body").submit();
   }
 
   $.ajax({
@@ -26,6 +35,11 @@ $(document).ready(function () {
     error: function () {
       console.log("fdcsxz");
     },
+  });
+
+  $(document).on("click", "#search_submit", function (e) {
+    const searchTerm = $("#search_bar").val();
+    submit(`/search/${searchTerm}`, "GET", []);
   });
 
   $(document).on("click", ".dropdown-item", function (e) {
@@ -76,25 +90,23 @@ $(document).ready(function () {
   $(document).on("click", "#filterButton", function (e) {
     const filterData = $("#filterData").serializeArray();
 
-    const prop_list = objectifyForm(filterData);
+    console.log(filterData);
+    const updatedData = [];
 
-    for (i of Object.keys(prop_list)) {
-      if (prop_list[i] == "") {
-        delete prop_list[i];
+    for (i of filterData) {
+      if (i.value == "") {
+        continue;
       }
+      updatedData.push(i);
     }
+    console.log(updatedData);
+    submit("/filter", "POST", updatedData);
+  });
 
-    console.log(prop_list);
-
-    $.ajax({
-      url: `/filter`,
-      type: "POST",
-      dataType: "json",
-      data: prop_list,
-      success: function (data) {
-        console.log(data);
-      },
-      error: function () {},
-    });
+  $(document).on("click", "#search_submit", function () {
+    console.log("frnm d");
+    const searchTerm = $("#search_bar").val();
+    console.log(searchTerm);
+    submit(`/search/${searchTerm}`, "GET", [{ name: "d", value: "csx" }]);
   });
 });

@@ -1,12 +1,12 @@
 const express = require("express");
-const { reset } = require("nodemon");
 const router = express.Router();
 const data = require("../data");
 const productsData = data.products;
 const commentsData = data.comments;
 const productType = data.productType;
-const usersData = data.users;
+
 const errorHandler = require("../Error/DatabaseErrorHandling");
+const { get, route } = require("./users");
 
 router.post("/product", async (req, res) => {
   const productInfo = req.body;
@@ -14,29 +14,15 @@ router.post("/product", async (req, res) => {
   productInfo["price"] = parseFloat(productInfo.price);
   productInfo["stock"] = parseInt(productInfo.stock);
 
-  // productInfo["facet"] = [
-  //   { property: "product_type", value: "plant" },
-  //   { property: "color", value: "green" },
-  // ];
-
-  for (i of productInfo.facet) {
-    if (!isNaN(parseFloat(i.value))) {
-      i.value = parseFloat(i.value);
-    }
-  }
+  productInfo["facet"] = [
+    { property: "product_type", value: "plant" },
+    { property: "color", value: "green" },
+  ];
 
   console.log(productInfo.productImage);
 
   console.log(productInfo);
   try {
-    if (isNaN(productInfo["stock"])) {
-      throw "Please enter a valid stock value";
-    }
-
-    if (isNaN(productInfo["price"])) {
-      throw "Please enter a valid price";
-    }
-
     errorHandler.checkObject(productInfo, "Product form data");
     errorHandler.checkString(productInfo.title, "title");
     errorHandler.checkString(productInfo.description, "Description");
@@ -62,7 +48,7 @@ router.post("/product", async (req, res) => {
     res.status(200);
   } catch (error) {
     console.log(error);
-    res.sendStatus(404);
+    res.status(500).json({ error: "Product was not added" });
   }
 });
 
@@ -109,7 +95,6 @@ router.patch("/product/like/:id", async (req, res) => {
 });
 
 //to get product by Id provided
-
 router.get("/products/product/:id", async (req, res) => {
   try {
     if (req.session.user) {
@@ -139,7 +124,6 @@ router.post("/", async (req, res) => {
     return;
   }
 });
-
 router.patch("/product/like/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
@@ -226,39 +210,10 @@ router.patch("/product/comment/:id", async (req, res) => {
   }
 });
 
-router.get("/addtocart/:id", async (req, res) => {
+router.patch("/product/addtocart/:id", async (req, res) => {
   try {
-    console.log("rfdsx");
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    if (req.session.user) {
-      console.log(req.session);
-      req.session.cartItems.push(req.params.id);
-      res.sendStatus(200);
-    } else {
-      console.log("fdscxz");
-      res.sendStatus(404);
-    }
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(404);
-  }
-});
-
-router.get("/cart/", async (req, res) => {
-  try {
-    if (req.session.user) {
-      const productsList = [];
-      let unique = req.session.cartItems.filter(
-        (v, i, a) => a.indexOf(v) === i
-      );
-
-      for (i of unique) {
-        productsList.push(await productsData.getProductById(i));
-      }
-      res.json(productsList);
-    } else {
-      res.sendStatus(404);
-    }
+    res.sendStatus(200);
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
@@ -294,21 +249,31 @@ router.get("/properties/:type", async (req, res) => {
         res.json(result);
         return;
       }
+      result.push(type.type);
     }
-    res.sendStatus(404);
+    res.status(200);
+    res.json(result);
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
   }
 });
 
-router.get("/search/:searchTerm", async (req, res) => {
-  const searchTerm = req.params.searchTerm;
+router.post("/search", async (req, res) => {
+  console.log("hello");
+  const searchTerm = req.body.searchTerm;
   try {
     errorHandler.checkString(searchTerm);
     const productList = await productsData.searchProduct(searchTerm);
-    console.log(productList);
-    return res.status(200).json({ product: productList });
+
+    if (productList.length > 0) {
+      hasProduct = true;
+    }
+    return res.render("pages/home", {
+      title: "All Product List",
+      productList: productList,
+      hasProduct: hasProduct,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ message: error });
@@ -320,11 +285,20 @@ router.post("/filter", async (req, res) => {
   try {
     errorHandler.checkFilterProperties(filterProp);
     const productList = await productsData.filterProducts(filterProp);
-    console.log(productList);
-    return res.status(200).json({ product: productList });
+
+    if (productList.length > 0) {
+      hasProduct = true;
+    }
+
+    return res.render("pages/home", {
+      title: "All Product List",
+      productList: productList,
+      hasProduct: hasProduct,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ message: error });
   }
 });
+
 module.exports = router;
