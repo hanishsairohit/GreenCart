@@ -3,6 +3,7 @@ const { reset } = require("nodemon");
 const router = express.Router();
 const data = require("../data");
 const productsData = data.products;
+
 const commentsData = data.comments;
 const productType = data.productType;
 const usersData = data.users;
@@ -103,10 +104,23 @@ router.get("/", async (req, res) => {
   }
 });
 
+// like
+router.patch("/product/like/:id", async (req, res) => {
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    await productsData.addLike(req.params.id, "6096ea6fb548d9936bc7c9bd");
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+
 //to get product by Id provided
 
 router.get("/products/product/:id", async (req, res) => {
   try {
+
     if (req.session.user) {
       errorHandler.checkStringObjectId(req.params.id, "Product ID");
       let product = await productsData.getProductById(req.params.id);
@@ -119,8 +133,7 @@ router.get("/products/product/:id", async (req, res) => {
       res.sendStatus(404).json({ message: "User not Authenticated" });
     }
   } catch (e) {
-    console.log(e);
-    res.status(404).json({ error: "Product not found" });
+    return res.status(404).json({ error: "product not found" });
   }
 });
 
@@ -163,7 +176,7 @@ router.patch("/product/dislike/:id", async (req, res) => {
     console.log(error);
     res.sendStatus(404);
   }
-});
+
 
 router.patch("/product/comment/:id", async (req, res) => {
   const comment_text = req.body;
@@ -309,8 +322,8 @@ router.get("/search/:searchTerm", async (req, res) => {
     console.log(error);
     return res.status(400).json({ message: error });
   }
-});
-
+  
+    
 router.post("/filter", async (req, res) => {
   const filterProp = req.body;
   try {
@@ -323,5 +336,4 @@ router.post("/filter", async (req, res) => {
     return res.status(400).json({ message: error });
   }
 });
-
 module.exports = router;
