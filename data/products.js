@@ -336,8 +336,8 @@ let exportedMethods = {
       })
       .toArray();
 
-    if (productsList.length == 0)
-      throw "Could not find products with the given search term";
+    // if (productsList.length == 0)
+    //   throw "Could not find products with the given search term";
     return productsList;
   },
 
