@@ -14,7 +14,6 @@ $(document).ready(function () {
     let i = 1;
     const facetList = [];
     const body = objectifyForm($("#productForm").serializeArray());
-
     facetList.push({ property: "product_type", value: body["product_type"] });
     while (i <= count) {
       facetList.push({
