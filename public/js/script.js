@@ -14,7 +14,6 @@ $(document).ready(function () {
     let i = 1;
     const facetList = [];
     const body = objectifyForm($("#productForm").serializeArray());
-
     facetList.push({ property: "product_type", value: body["product_type"] });
     while (i <= count) {
       facetList.push({
@@ -63,19 +62,33 @@ $(document).ready(function () {
     divTag.append(add);
   });
 
-  $(".delete_product").on("click", function (e) {
-    var id = $(this).attr("data-id");
-    alert(id);
-    $.ajax({
-      url: "/product/" + id, // url where to submit the request
-      type: "delete", // type of action POST || GET
-      dataType: "json", // data type
-      // data : id, // post data || get data
-      success: function (data) {
-        //    alert("deleted");
-        location.reload();
-      },
-      error: function () {},
+    $('.delete_product').on('click', function(e) {
+        var id = $(this).attr('data-id');
+        $.ajax({
+            url: '/product/'+ id, // url where to submit the request
+            type : "delete", // type of action POST || GET
+            dataType : 'json', // data type
+            // data : id, // post data || get data
+            success : function(data) {
+            //    alert("deleted");
+                location.reload();
+            },
+            error: function() {
+                
+            }
+        })
     });
-  });
+    $('.product_click').on('click', function(e) {
+        var id = $(this).attr('data-id');
+        $.ajax({
+            url: '/product/'+ id, // url where to submit the request
+            type : "GET", // type of action POST || GET
+            success : function(data) {
+                window.location.href = 'http://localhost:3000/product/'+id;
+            },
+            error: function() {
+                
+            }
+        })
+    });
 });
