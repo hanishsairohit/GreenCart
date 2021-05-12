@@ -47,15 +47,8 @@ router.post("/product", async (req, res) => {
     errorHandler.checkFacet(productInfo.facet);
     errorHandler.checkFloat(productInfo.price, "price");
 
-    const {
-      title,
-      description,
-      productImage,
-      createdBy,
-      stock,
-      facet,
-      price,
-    } = productInfo;
+    const { title, description, productImage, createdBy, stock, facet, price } =
+      productInfo;
 
     const newProduct = await productsData.addProduct(
       title,
@@ -93,7 +86,7 @@ router.get("/", async (req, res) => {
     if (productList.length > 0) {
       hasProduct = true;
     }
-    
+
     return res.render("pages/home", {
       title: "All Product List",
       productList: productList,
@@ -120,18 +113,21 @@ router.patch("/product/like/:id", async (req, res) => {
 
 router.get("/products/product/:id", async (req, res) => {
   try {
-
-    if (req.session.user) {
-      errorHandler.checkStringObjectId(req.params.id, "Product ID");
-      let product = await productsData.getProductById(req.params.id);
-      await usersData.userViewsAProduct(req.session.user._id, req.params.id);
-      res.render("pages/singleProduct", {
-        title: product.title,
-        product: product,
-      });
-    } else {
-      res.sendStatus(404).json({ message: "User not Authenticated" });
-    }
+    // if (req.session.user) {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    let product = await productsData.getProductById(req.params.id);
+    console.log(product);
+    await usersData.userViewsAProduct(
+      "609a2fca59ef0ecfeb7b57af",
+      req.params.id
+    );
+    res.render("pages/singleProduct", {
+      title: product.title,
+      product: product,
+    });
+    // } else {
+    //   res.sendStatus(404).json({ message: "User not Authenticated" });
+    // }
   } catch (e) {
     return res.status(404).json({ error: "product not found" });
   }
@@ -176,7 +172,7 @@ router.patch("/product/dislike/:id", async (req, res) => {
     console.log(error);
     res.sendStatus(404);
   }
-
+});
 
 router.patch("/product/comment/:id", async (req, res) => {
   const comment_text = req.body;
@@ -322,18 +318,27 @@ router.get("/search/:searchTerm", async (req, res) => {
     console.log(error);
     return res.status(400).json({ message: error });
   }
-  
-    
+});
+
 router.post("/filter", async (req, res) => {
   const filterProp = req.body;
   try {
     errorHandler.checkFilterProperties(filterProp);
     const productList = await productsData.filterProducts(filterProp);
-    console.log(productList);
-    return res.status(200).json({ product: productList });
+
+    if (productList.length > 0) {
+      hasProduct = true;
+    }
+
+    return res.render("pages/home", {
+      title: "All Product List",
+      productList: productList,
+      hasProduct: hasProduct,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ message: error });
   }
 });
+
 module.exports = router;

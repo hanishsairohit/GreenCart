@@ -2,6 +2,23 @@ $(document).ready(function () {
   const productTypes_dropdown = $("#displayProp");
   const filterDiv = $("#filterDiv");
 
+  function submit(action, method, values) {
+    var form = $("<form/>", {
+      action: action,
+      method: method,
+    });
+    $.each(values, function () {
+      form.append(
+        $("<input/>", {
+          type: "hidden",
+          name: this.name,
+          value: this.value,
+        })
+      );
+    });
+    form.appendTo("body").submit();
+  }
+
   function objectifyForm(formArray) {
     //serialize data function
     var returnArray = {};
@@ -76,25 +93,16 @@ $(document).ready(function () {
   $(document).on("click", "#filterButton", function (e) {
     const filterData = $("#filterData").serializeArray();
 
-    const prop_list = objectifyForm(filterData);
+    console.log(filterData);
+    const updatedData = [];
 
-    for (i of Object.keys(prop_list)) {
-      if (prop_list[i] == "") {
-        delete prop_list[i];
+    for (i of filterData) {
+      if (i.value == "") {
+        continue;
       }
+      updatedData.push(i);
     }
-
-    console.log(prop_list);
-
-    $.ajax({
-      url: `/filter`,
-      type: "POST",
-      dataType: "json",
-      data: prop_list,
-      success: function (data) {
-        console.log(data);
-      },
-      error: function () {},
-    });
+    console.log(updatedData);
+    submit("/filter", "POST", updatedData);
   });
 });
