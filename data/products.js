@@ -203,6 +203,31 @@ let exportedMethods = {
 
     await users.userLikesAProduct(userID, productID);
   },
+  async addDisLike(productID, userID) {
+    errorHandler.checkStringObjectId(productID, "Product ID");
+    errorHandler.checkStringObjectId(userID, "User ID");
+    const productsCollection = await products();
+    const updatedInfo = await productsCollection.updateOne(
+      {
+        _id: ObjectId(productID),
+      },
+      {
+        $inc: {
+          noOfLikes: -1,
+        },
+
+        $pull: {
+          likedBy: ObjectId(userID),
+        },
+      }
+    );
+
+    if (updatedInfo.updatedCount === 0) throw "Update failed to add dis like";
+
+    const users = require("./index").users;
+
+    await users.userDisLikesAProduct(userID, productID);
+  },
 
   async updateStockOfProduct(productID) {
     errorHandler.checkStringObjectId(productID, "Product ID");

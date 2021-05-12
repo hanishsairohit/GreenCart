@@ -94,8 +94,7 @@ router.get("/", async (req, res) => {
 });
 
 //to get product by Id provided
-router.get("/product/:id", async (req, res) => {
-  console.log(req.params.id);
+router.get("/products/product/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     let product = await productsData.getProductById(req.params.id);
@@ -132,21 +131,7 @@ router.patch("/product/like/:id", async (req, res) => {
 });
 
 router.patch("/product/comment/:id", async (req, res) => {
-  try {
-    errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    await commentsData.addComment(
-      "6096ea6fb548d9936bc7c9bd",
-      req.params.id,
-      "This product is so good"
-    );
-    res.sendStatus(200);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(404);
-  }
-});
-
-router.patch("/product/comment/:id", async (req, res) => {
+  
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     await commentsData.addComment(
@@ -162,6 +147,7 @@ router.patch("/product/comment/:id", async (req, res) => {
 });
 
 router.patch("/product/addtocart/:id", async (req, res) => {
+  
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     res.sendStatus(200);
