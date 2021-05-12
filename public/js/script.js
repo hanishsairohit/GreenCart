@@ -14,7 +14,6 @@ $(document).ready(function () {
     let i = 1;
     const facetList = [];
     const body = objectifyForm($("#productForm").serializeArray());
-
     facetList.push({ property: "product_type", value: body["product_type"] });
     while (i <= count) {
       facetList.push({
@@ -61,7 +60,11 @@ $(document).ready(function () {
     <input type='text' name='value' class='form-control' id = 'prop_val${count}'>`;
 
     divTag.append(add);
+<<<<<<< HEAD
     });
+=======
+  });
+>>>>>>> 70a891e0497b88f8e0aa5952e80e4f22601a722e
 
     $('.delete_product').on('click', function(e) {
         var id = $(this).attr('data-id');

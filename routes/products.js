@@ -61,7 +61,10 @@ router.post("/product", async (req, res) => {
 });
 
 router.delete("/product/:id", async (req, res) => {
+<<<<<<< HEAD
   
+=======
+>>>>>>> 70a891e0497b88f8e0aa5952e80e4f22601a722e
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     const product = await productsData.getProductById(req.params.id);
@@ -94,6 +97,10 @@ router.get("/", async (req, res) => {
 });
 
 //to get product by Id provided
+<<<<<<< HEAD
+=======
+
+>>>>>>> 70a891e0497b88f8e0aa5952e80e4f22601a722e
 router.get("/products/product/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
@@ -179,7 +186,16 @@ router.get("/properties/:type", async (req, res) => {
     const result = [];
     for (type of types) {
       if (type.type == req.params.type) {
+<<<<<<< HEAD
         result.push();
+=======
+        for (prop of type.properties) {
+          const { name, type, values } = prop;
+          result.push({ name, type, values });
+        }
+        res.json(result);
+        return;
+>>>>>>> 70a891e0497b88f8e0aa5952e80e4f22601a722e
       }
       result.push(type.type);
     }
@@ -204,6 +220,21 @@ router.get("/search/:searchTerm", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 
+=======
+router.post("/filter", async (req, res) => {
+  const filterProp = req.body;
+  try {
+    errorHandler.checkFilterProperties(filterProp);
+    const productList = await productsData.filterProducts(filterProp);
+    console.log(productList);
+    return res.status(200).json({ product: productList });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ message: error });
+  }
+});
+>>>>>>> 70a891e0497b88f8e0aa5952e80e4f22601a722e
 
 module.exports = router;
