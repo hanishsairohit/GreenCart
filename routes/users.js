@@ -173,7 +173,7 @@ router.get("/signup", async (req, res) => {
   if (req.session.user) {
     return res.redirect("/");
   }
-  return res.render("pages/signUp");
+  return res.render("pages/signUp", { title: "SignUp Page" });
 });
 
 router.post("/signup", async (req, res) => {
