@@ -3,6 +3,7 @@ const router = express.Router();
 const data = require("../data");
 const adminData = data.admin;
 const productsData = data.products;
+const usersData = data.users;
 const bcrypt = require("bcryptjs");
 const e = require("express");
 dataError = require("../Error/DatabaseErrorHandling");
@@ -81,6 +82,48 @@ router.get("/logout", async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+  }
+});
+
+//Users userInfo
+
+router.get("/users", async (req, res) => {
+  try {
+    // if (req.session.admin) {
+    usersDetails = await usersData.getAllUsers();
+    if (usersDetails.length > 0) {
+      hasUsers = true;
+      return res.render("pages/usersList", {
+        title: "Users List",
+        users: usersDetails,
+        hasUsers: hasUsers,
+      });
+    } else {
+      return res.render("pages/home", {
+        title: "Only Admin Access",
+        hasUser: false,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status().json({ message: error });
+  }
+});
+
+router.get("/users/:id", async (req, res) => {
+  if (req.session.admin) {
+    const userInfo = await usersData.getUser(req.params.id);
+    if (userInfo.length > 0) {
+      return res.render("pages/userInfo", {
+        title: "User Information",
+        userInfo: userInfo,
+      });
+    }
+  } else {
+    return res.render("pages/home", {
+      title: "Only Admin Access",
+      error: "Only Admin Access",
+    });
   }
 });
 

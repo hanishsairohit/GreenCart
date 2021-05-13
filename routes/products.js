@@ -106,7 +106,7 @@ router.get("/products/product/:id", async (req, res) => {
         product: product,
       });
     } else {
-      return res.status(404).json({ message: "User not Authenticated" });
+      return res.render("pages/loginPage", { title: "Need to login first" });
     }
   } catch (e) {
     return res.status(404).json({ error: "product not found" });

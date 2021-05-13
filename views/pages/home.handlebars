@@ -51,7 +51,7 @@
 
 </div>
 
-<div class="container" id="#productDiv">
+{{!-- <div class="container" id="#productDiv">
   <div class="row" id="productList">
     {{#each productList}}
       <div class="col bg-success">
@@ -73,4 +73,34 @@
     {{/each}}
   </div>
 
+</div> --}}
+
+{{!  }}
+<div class="container">
+  <div class="row">
+    {{#each productList}}
+
+      <section class="col-lg-4 col-md-4 col-sm-7 col-xs-12">
+        <div class="mx-3 mt-4 card">
+          <img
+            class="card-img-top"
+            src={{this.productImage}}
+            alt="{{this.title}} Image"
+          />
+          <div class="card-body">
+            <h2 class="card-title">Title: {{this.title}}</h2>
+            <p class="card-text">Price: {{this.price}}</p>
+
+          </div>
+          <div class="card-footer">
+            <a
+              class="btn btn-primary text-center"
+              href="products/product/{{this._id}}"
+              data-id="{{this._id}}"
+            > Buy </a>
+          </div>
+        </div>
+      </section>
+    {{/each}}
+  </div>
 </div>

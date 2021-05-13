@@ -45,12 +45,10 @@ router.get("/", async (req, res) => {
 
 // Users Details Pages
 router.get("/details", async (req, res) => {
-  console.log(req.session.user);
-
   try {
     if (req.session.user) {
       const userInfo = await usersData.getUser(req.session.user._id);
-      console.log("fdsc");
+
       const userComments = await usersData.getUserComments(
         req.session.user._id
       );
@@ -60,12 +58,11 @@ router.get("/details", async (req, res) => {
         req.session.user._id
       );
       console.log(userViewedProduct);
-      userViewedProduct = [...new Set(userViewedProduct)];
-      console.log("fds");
+      // userViewedProduct = [...new Set(userViewedProduct)];
+
       const userBoughtProducts = await usersData.getUserBoughtProducts(
         req.session.user._id
       );
-      console.log("fr");
 
       return res.render("pages/userDetail", {
         title: "User Info page",
@@ -79,8 +76,7 @@ router.get("/details", async (req, res) => {
       return res.redirect("/users/form");
     }
   } catch (error) {
-    console.log(error);
-    res.sendStatus(404);
+    return res.sendStatus(404);
   }
 });
 
