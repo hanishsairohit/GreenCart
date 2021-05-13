@@ -124,7 +124,6 @@ $(document).ready(function () {
         })
     });
 
-
     $('.product_like').on('click', function(e) {
         var id = $(this).attr('data-id');
         alert("cvcvcc");
@@ -155,4 +154,6 @@ $(document).ready(function () {
         })
     });
 
+
+  
 });
