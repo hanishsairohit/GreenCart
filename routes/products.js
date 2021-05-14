@@ -4,6 +4,7 @@ const data = require("../data");
 const productsData = data.products;
 const commentsData = data.comments;
 const productType = data.productType;
+const xss = require("xss");
 
 const errorHandler = require("../Error/DatabaseErrorHandling");
 const { get, route } = require("./users");
@@ -13,7 +14,6 @@ router.post("/product", async (req, res) => {
 
   productInfo["price"] = parseFloat(productInfo.price);
   productInfo["stock"] = parseInt(productInfo.stock);
-
 
   console.log(productInfo.productImage);
 
@@ -67,7 +67,6 @@ router.delete("/product/:id", async (req, res) => {
     const product = await productsData.getProductById(req.params.id);
     await productsData.deleteProduct(req.params.id, product.stock);
     return res.json(product);
-
   } catch (error) {
     console.log(error);
     return res.status(404);
@@ -96,7 +95,6 @@ router.get("/", async (req, res) => {
 //to get product by Id provided
 router.get("/products/product/:id", async (req, res) => {
   try {
-
     // if (req.session.user) {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     let product = await productsData.getProductById(req.params.id);
@@ -154,7 +152,6 @@ router.patch("/product/dislike/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     if (req.session.user) {
-
       await productsData.addDisLike(req.params.id, req.session.user._id);
       res.sendStatus(200);
     } else {
@@ -181,17 +178,17 @@ router.patch("/product/dislike/:id", async (req, res) => {
 });
 
 router.patch("/product/comment/:id", async (req, res) => {
-  const comment_text = xss(req.body);
+  const comment_text = req.body.review;
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    errorHandler.checkString(xss(req.body));
+    errorHandler.checkString(req.body.review);
     if (req.session.user) {
       await commentsData.addComment(
         req.session.user._id,
         req.params.id,
         comment_text
       );
-      return res.render("/pages/singleProduct", { title: "Product" });
+      return res.sendStatus(200);
     } else {
       return res.sendStatus(404);
     }
@@ -223,7 +220,6 @@ router.get("/buy", async (req, res) => {
 });
 
 router.patch("/product/comment/:id", async (req, res) => {
-
   const comment_text = req.body.review;
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
@@ -243,7 +239,6 @@ router.patch("/product/comment/:id", async (req, res) => {
     res.sendStatus(404);
   }
 });
-
 
 router.patch("/addtocart/:id", async (req, res) => {
   try {
