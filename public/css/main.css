@@ -227,4 +227,18 @@ ul {
 .home_link:hover {
   background-color: #edfcce;
   color: #fff;
+
+}
+
+#liked {
+  color: blue;
+}
+
+#unliked {
+  color: green;
+}
+
+#productPropHeading {
+  font-weight: 500;
+  color: red;
 }
