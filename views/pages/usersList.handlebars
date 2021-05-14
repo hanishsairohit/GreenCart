@@ -1,0 +1,24 @@
+<h1 class="text-primary text-uppercase fw-bold text-center">Users List</h1>
+
+{{#if hasUsers}}
+  <ul id="usersList">
+
+    {{#each users}}
+      <li class="list-group-item"><a href="/admin/users/{{_id}}">{{firstName}}
+          {{lastName}}
+          :
+          {{emailId}}
+          {{_id}}</a></li>
+    {{/each}}
+
+  </ul>
+{{/if}}
+<hr />
+
+<div>
+  <a href="/admin" class="btn btn-warning">Back</a>
+</div>
+<br />
+<div>
+  <a href="/admin/logout" class="btn btn-danger">Logout</a>
+</div>

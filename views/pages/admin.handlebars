@@ -1,90 +1,124 @@
 <div id="add_new_product">
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong"> Add New</button>
-    <!-- Modal -->
-        <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document" id="prod_modal_dialog">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title" id="exampleModalLongTitle">Add New Product</h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form id="productForm" name="product" role="form">
-                    <div class="modal-body">				
-                        <div class="form-group">
-                            <label for="type">Name</label>
-                            <input type="text" name="title" class="form-control">
-                        </div>
-                         <div class="form-group">
-                            <label for="message">Description</label>
-                            <textarea name="description" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="productImage">Image</label>
-                            <input type="text" name="productImage" class="form-control">
-                        </div>
-                         <div class="form-group">
-                            <label for="createdBy">Created By</label>
-                            <input type="text" name="createdBy" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="stock">In Stock</label>
-                            <input type="text" name="stock" class="form-control">
-                        </div>
-
-                         <div class="form-group">
-                            <label for="price">Price</label>
-                            <input type="number" name="price" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="product_type">Product Type</label>
-                            <input type="text" name="product_type" class="form-control">
-                        </div>
-
-                         <div id="properties">
-
-                        </div>
-
-                        <button type="button" class="btn btn-primary" id="add_property">Add Property</button>
-                       
-                        					
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="add_product_sub">Add Product</button>
-                    </div>
-                    <div id="error_msg"></div>
-                </form>
-                </div>
-            </div>
+  <button
+    type="button"
+    class="btn btn-primary"
+    data-toggle="modal"
+    data-target="#exampleModalLong"
+  > Add New</button>
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="exampleModalLong"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLongTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg" role="document" id="prod_modal_dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title" id="exampleModalLongTitle">Add New Product</h1>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <form id="productForm" name="product" role="form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="type">Name</label>
+              <input type="text" name="title" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="message">Description</label>
+              <textarea name="description" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="productImage">Image</label>
+              <input type="text" name="productImage" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="createdBy">Created By</label>
+              <input type="text" name="createdBy" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="stock">In Stock</label>
+              <input type="text" name="stock" class="form-control" />
+            </div>
+
+            <div class="form-group">
+              <label for="price">Price</label>
+              <input type="number" name="price" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="product_type">Product Type</label>
+              <input type="text" name="product_type" class="form-control" />
+            </div>
+
+            <div id="properties">
+
+            </div>
+
+            <button type="button" class="btn btn-primary" id="add_property">Add
+              Property</button>
+
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >Close</button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="add_product_sub"
+            >Add Product</button>
+          </div>
+          <div id="error_msg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 <div id="admin_table">
-    <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
-	<thead>
-		<tr>
-			<th>Name</th>
-            <th>Description</th>
-			<th>Price</th>
-			<th>Count</th>
-            <th>Action</th>
-		</tr>
-	</thead>
-	<tbody>
-         {{#each productList}}
-		<tr>
-			<td>{{this.title}}</td>
-			<td>{{this.description}}</td>
-			<td>{{this.price}}</td>
-			<td>{{this.stock}}</td>
-            <td><button type="button" class="btn btn-danger delete_product" data-id="{{this._id}}">Delete</button></td>
-		</tr>
+  <table
+    id="example"
+    class="table table-striped table-bordered"
+    cellspacing="0"
+    width="100%"
+  >
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Count</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each productList}}
+        <tr>
+          <td>{{this.title}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.price}}</td>
+          <td>{{this.stock}}</td>
+          <td><button
+              type="button"
+              class="btn btn-danger delete_product"
+              data-id="{{this._id}}"
+            >Delete</button></td>
+        </tr>
 
-		
-        {{/each}}
+      {{/each}}
 
-	
-	</tbody>
-    </table>
+    </tbody>
+  </table>
+
+  <a href="/admin/logout" class="btn btn-danger">Admin Log Out</a>
 </div>

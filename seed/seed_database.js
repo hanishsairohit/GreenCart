@@ -284,6 +284,12 @@ async function main() {
   };
 
   console.log(await products.filterProducts(prop_));
+  await admin.addAdmin(
+    "Hanish",
+    "Rohit",
+    "hanishPassword",
+    "hanish@stevens.edu"
+  );
 
   //   await products.deleteProduct(product1, 34);
   //   await products.deleteProduct(product6, 24);
