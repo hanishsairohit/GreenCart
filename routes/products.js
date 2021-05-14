@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const data = require("../data");
 const productsData = data.products;
-
 const commentsData = data.comments;
 const productType = data.productType;
 
@@ -14,6 +13,7 @@ router.post("/product", async (req, res) => {
 
   productInfo["price"] = parseFloat(productInfo.price);
   productInfo["stock"] = parseInt(productInfo.stock);
+
 
   console.log(productInfo.productImage);
 
@@ -66,10 +66,11 @@ router.delete("/product/:id", async (req, res) => {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     const product = await productsData.getProductById(req.params.id);
     await productsData.deleteProduct(req.params.id, product.stock);
-    res.json(product);
+    return res.json(product);
+
   } catch (error) {
     console.log(error);
-    res.sendStatus(404);
+    return res.status(404);
   }
 });
 
@@ -82,6 +83,7 @@ router.get("/", async (req, res) => {
     }
 
     return res.render("pages/home", {
+      authenticated: req.session.user ? true : false,
       title: "All Product List",
       productList: productList,
       hasProduct: hasProduct,
@@ -94,6 +96,7 @@ router.get("/", async (req, res) => {
 //to get product by Id provided
 router.get("/products/product/:id", async (req, res) => {
   try {
+
     // if (req.session.user) {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     let product = await productsData.getProductById(req.params.id);
@@ -151,6 +154,21 @@ router.patch("/product/dislike/:id", async (req, res) => {
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     if (req.session.user) {
+
+      await productsData.addDisLike(req.params.id, req.session.user._id);
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(404);
+  }
+});
+router.patch("/product/dislike/:id", async (req, res) => {
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    if (req.session.user) {
       await productsData.addDisLike(req.params.id, req.session.user._id);
       res.sendStatus(200);
     } else {
@@ -163,6 +181,49 @@ router.patch("/product/dislike/:id", async (req, res) => {
 });
 
 router.patch("/product/comment/:id", async (req, res) => {
+  const comment_text = xss(req.body);
+  try {
+    errorHandler.checkStringObjectId(req.params.id, "Product ID");
+    errorHandler.checkString(xss(req.body));
+    if (req.session.user) {
+      await commentsData.addComment(
+        req.session.user._id,
+        req.params.id,
+        comment_text
+      );
+      return res.render("/pages/singleProduct", { title: "Product" });
+    } else {
+      return res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(404);
+  }
+});
+
+router.get("/buy", async (req, res) => {
+  try {
+    if (req.session.user) {
+      let unique = req.session.cartItems.filter(
+        (v, i, a) => a.indexOf(v) === i
+      );
+
+      for (i of unique) {
+        await usersData.userPurchasesAProduct(req.session.user._id, i);
+      }
+      req.session.cartItems = [];
+      return res.status(200).json({ cartItems: req.session.cartItems });
+    } else {
+      return res.status(404).json({ error: "Error while adding to cart" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({ message: error });
+  }
+});
+
+router.patch("/product/comment/:id", async (req, res) => {
+
   const comment_text = req.body.review;
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
@@ -182,6 +243,7 @@ router.patch("/product/comment/:id", async (req, res) => {
     res.sendStatus(404);
   }
 });
+
 
 router.patch("/addtocart/:id", async (req, res) => {
   try {
@@ -268,6 +330,7 @@ router.post("/search", async (req, res) => {
       hasProduct = true;
     }
     return res.render("pages/home", {
+      authenticated: req.session.user ? true : false,
       title: "All Product List",
       productList: productList,
       hasProduct: hasProduct,
@@ -310,6 +373,7 @@ router.post("/filter", async (req, res) => {
     }
 
     return res.render("pages/home", {
+      authenticated: req.session.user ? true : false,
       title: "All Product List",
       productList: productList,
       hasProduct: hasProduct,

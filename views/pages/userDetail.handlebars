@@ -1,36 +1,56 @@
 <h1>{{userInfo.firstName}} {{userInfo.lastName}}</h1>
 
+<div class="container">
+  {{#if purchase}}
+    <h2>Purchase History</h2>
+    <ul>
+      {{#each purchase}}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start text-primary"
+        ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
+      {{/each}}
+    </ul>
+  {{/if}}
+  {{!  }}
 
-<h2>Purchase History</h2>
+  {{#if comments}}
+    <h2>Comments</h2>
 
-<ul>
-    {{#each purchase}}
-    <li><a href="/product/{{this._id}}">{{this.title}}</a></li>
-    {{/each}}
-</ul>
+    <ul>
+      {{#each comments}}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start text-primary"
+        ><a
+            href="/products/product/{{this.productId}}"
+          >{{this.commentText}}</a></li>
+      {{/each}}
+    </ul>
+  {{/if}}
+  {{!  }}
+  {{#if viewdProduct}}
+    <h2>Viewd Products</h2>
 
+    <ul>
+      {{#each viewdProduct}}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start text-primary"
+        ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
 
+      {{/each}}
+    </ul>
+  {{/if}}
+  {{!  }}
+  {{#if liked}}
+    <h2>Liked Products</h2>
 
-<h2>Comments</h2>
+    <ul>
+      {{#each liked}}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start text-primary"
+        ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
 
-<ul>
-    {{#each comments}}
-    <li><a href="/product/{{this.productId}}">{{this.commentText}}</a></li>
-    {{/each}}
-</ul>
+      {{/each}}
+    </ul>
+  {{/if}}
 
-
-
-
-<h2>Viewd Products</h2>
-
-<ul>
-    {{#each viewdProduct}}
-    <li><a href="/product/{{this._id}}">{{this.title}}</a></li>
-
-    {{/each}}
-</ul>
-
-
-
-<a href="/users/logout"> Click to logout </a>
+</div>

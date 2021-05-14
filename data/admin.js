@@ -29,7 +29,7 @@ module.exports = {
       lastname: lastname,
       password: hasedPassword,
       addedProducts: [],
-      emailID: emailID,
+      emailID: emailID.toLowerCase(),
     };
 
     const insertedInfo = await adminCollection.insertOne(newAdmin);
@@ -37,6 +37,20 @@ module.exports = {
       throw "Cound not able to insert an admin.";
     }
     return insertedInfo.insertedId.toString();
+  },
+
+  async getAllAdmins() {
+    const adminCollection = await admin();
+    const allAdmins = await adminCollection.find({}).toArray();
+    if (!allAdmins || allAdmins.length == 0) {
+      console.log("admin collection is empty");
+      return;
+    } else {
+      for (i of allAdmins) {
+        i._id = i._id.toString();
+      }
+      return allAdmins;
+    }
   },
 
   async getAdmin(adminId) {

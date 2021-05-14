@@ -237,6 +237,7 @@ module.exports = {
     const user = await this.getUser(UserID);
 
     const productsList = [];
+
     for (productID of user.viewHistory) {
       try {
         productsList.push(await products.getProductById(productID.toString()));

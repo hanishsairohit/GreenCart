@@ -21,6 +21,14 @@ app.use(
 );
 
 //MIDDLEWARES
+//admin access middleware
+// app.use("/admin", async (req, res, next) => {
+//   if (req.session.admin) {
+//     next();
+//   } else {
+//     return res.redirect("/");
+//   }
+// });
 
 // Terminate acess if user is not logged in.
 app.use("/users/details", async (req, res, next) => {
@@ -36,6 +44,16 @@ app.use((req, res, next) => {
   console.log(
     `[${date.toUTCString()}]:\t${req.method}\t${req.originalUrl}\t\t${
       req.session.user ? "(Authenticated)" : "(Not Authenticated)"
+    }`
+  );
+  next();
+});
+
+app.use((req, res, next) => {
+  date = new Date();
+  console.log(
+    `[${date.toUTCString()}]:\t${req.method}\t${req.originalUrl}\t\t${
+      req.session.admin ? "(Admin Authenticated)" : "(Admin Not Authenticated)"
     }`
   );
   next();
