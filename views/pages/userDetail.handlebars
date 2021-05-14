@@ -1,36 +1,56 @@
 <h1>{{userInfo.firstName}} {{userInfo.lastName}}</h1>
 
 <div class="container">
-  <h2>Purchase History</h2>
-  <ul>
-    {{#each purchase}}
-      <li
-        class="list-group-item d-flex justify-content-between align-items-start text-primary"
-      ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
-    {{/each}}
-  </ul>
+  {{#if purchase}}
+    <h2>Purchase History</h2>
+    <ul>
+      {{#each purchase}}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start text-primary"
+        ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
+      {{/each}}
+    </ul>
+  {{/if}}
+  {{!  }}
 
-  <h2>Comments</h2>
+  {{#if comments}}
+    <h2>Comments</h2>
 
-  <ul>
-    {{#each comments}}
-      <li
-        class="list-group-item d-flex justify-content-between align-items-start text-primary"
-      ><a
-          href="/products/product/{{this.productId}}"
-        >{{this.commentText}}</a></li>
-    {{/each}}
-  </ul>
+    <ul>
+      {{#each comments}}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start text-primary"
+        ><a
+            href="/products/product/{{this.productId}}"
+          >{{this.commentText}}</a></li>
+      {{/each}}
+    </ul>
+  {{/if}}
+  {{!  }}
+  {{#if viewdProduct}}
+    <h2>Viewd Products</h2>
 
-  <h2>Viewd Products</h2>
+    <ul>
+      {{#each viewdProduct}}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start text-primary"
+        ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
 
-  <ul>
-    {{#each viewdProduct}}
-      <li
-        class="list-group-item d-flex justify-content-between align-items-start text-primary"
-      ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
+      {{/each}}
+    </ul>
+  {{/if}}
+  {{!  }}
+  {{#if liked}}
+    <h2>Liked Products</h2>
 
-    {{/each}}
-  </ul>
+    <ul>
+      {{#each liked}}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start text-primary"
+        ><a href="/products/product/{{this._id}}">{{this.title}}</a></li>
+
+      {{/each}}
+    </ul>
+  {{/if}}
+
 </div>
-<a class="btn btn-danger" href="/users/logout">Logout </a>

@@ -73,6 +73,7 @@ router.get("/", async (req, res) => {
     }
 
     return res.render("pages/home", {
+      authenticated: req.session.user ? true : false,
       title: "All Product List",
       productList: productList,
       hasProduct: hasProduct,
@@ -102,11 +103,15 @@ router.get("/products/product/:id", async (req, res) => {
       let product = await productsData.getProductById(req.params.id);
       await usersData.userViewsAProduct(req.session.user._id, req.params.id);
       return res.render("pages/singleProduct", {
+        authenticated: true,
         title: product.title,
         product: product,
       });
     } else {
-      return res.render("pages/loginPage", { title: "Need to login first" });
+      return res.render("pages/loginPage", {
+        title: "Need to login first",
+        authenticated: false,
+      });
     }
   } catch (e) {
     return res.status(404).json({ error: "product not found" });
@@ -154,23 +159,23 @@ router.patch("/product/dislike/:id", async (req, res) => {
 });
 
 router.patch("/product/comment/:id", async (req, res) => {
-  const comment_text = req.body;
+  const comment_text = xss(req.body);
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    errorHandler.checkString(req.body);
+    errorHandler.checkString(xss(req.body));
     if (req.session.user) {
       await commentsData.addComment(
         req.session.user._id,
         req.params.id,
         comment_text
       );
-      res.render("/pages/singleProduct");
+      return res.render("/pages/singleProduct", { title: "Product" });
     } else {
-      res.sendStatus(404);
+      return res.sendStatus(404);
     }
   } catch (error) {
     console.log(error);
-    res.sendStatus(404);
+    return res.sendStatus(404);
   }
 });
 
@@ -270,6 +275,7 @@ router.post("/search", async (req, res) => {
       hasProduct = true;
     }
     return res.render("pages/home", {
+      authenticated: req.session.user ? true : false,
       title: "All Product List",
       productList: productList,
       hasProduct: hasProduct,
@@ -291,6 +297,7 @@ router.post("/filter", async (req, res) => {
     }
 
     return res.render("pages/home", {
+      authenticated: req.session.user ? true : false,
       title: "All Product List",
       productList: productList,
       hasProduct: hasProduct,

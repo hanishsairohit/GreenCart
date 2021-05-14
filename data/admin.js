@@ -29,7 +29,7 @@ module.exports = {
       lastname: lastname,
       password: hasedPassword,
       addedProducts: [],
-      emailID: emailID,
+      emailID: emailID.toLowerCase(),
     };
 
     const insertedInfo = await adminCollection.insertOne(newAdmin);

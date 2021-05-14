@@ -17,6 +17,7 @@ router.get("/form", async (req, res) => {
     console.log("into 2nd /form");
 
     return res.render("pages/loginPage", {
+      authenticated: false,
       title: "First",
     });
   }
@@ -63,14 +64,19 @@ router.get("/details", async (req, res) => {
       const userBoughtProducts = await usersData.getUserBoughtProducts(
         req.session.user._id
       );
+      const userLikedProducts = await usersData.getUserLikedProducts(
+        req.session.user._id
+      );
 
       return res.render("pages/userDetail", {
         title: "User Info page",
+        authenticated: true,
         userInfo: userInfo,
         comments: userComments,
         // likes: userLikes,
         viewdProduct: userViewedProduct,
         purchase: userBoughtProducts,
+        liked: userLikedProducts,
       });
     } else {
       return res.redirect("/users/form");
@@ -114,7 +120,10 @@ router.get("/user/:id", async (req, res) => {
 router.post("/login", async (req, res) => {
   console.log("login");
   if (req.session.user) {
-    return res.render("pages/userDetail", { title: "Already In" });
+    return res.render("pages/userDetail", {
+      authenticated: req.session.user ? true : false,
+      title: "Already In",
+    });
   } else {
     let email = xss(req.body.email.trim());
     const password = xss(req.body.password.trim());
@@ -134,20 +143,20 @@ router.post("/login", async (req, res) => {
         userClient = users[i];
       }
     }
-    console.log("UserClient: ", userClient);
+
     if (!userClient)
       errors.push("User E-mail address or password does not match.");
 
     if (errors.length > 0) {
       return res.render("pages/loginPage", {
+        authenticated: false,
         title: "No Match found",
         errors: errors,
       });
     }
 
     let match = await bcrypt.compare(password, userClient.password);
-    console.log("Match : ", match);
-    console.log("Error: ", errors);
+
     if (match) {
       req.session.user = userClient;
       console.log(req.session.user);
@@ -162,6 +171,7 @@ router.post("/login", async (req, res) => {
       errors.push("User E-mail address or password does not match");
       return res.render("pages/loginPage", {
         title: "Errors",
+        authenticated: false,
         // partial: "login-script",
         errors: errors,
       });
@@ -173,11 +183,14 @@ router.get("/signup", async (req, res) => {
   if (req.session.user) {
     return res.redirect("/");
   }
-  return res.render("pages/signUp", { title: "SignUp Page" });
+  return res.render("pages/signUp", {
+    title: "SignUp Page",
+    authenticated: false,
+  });
 });
 
 router.post("/signup", async (req, res) => {
-  dataSignIn = req.body;
+  dataSignIn = xss(req.body);
   const firstName = xss(dataSignIn.firstName);
   const lastName = xss(dataSignIn.lastName);
   const email = xss(dataSignIn.emailId);
@@ -225,6 +238,7 @@ router.post("/signup", async (req, res) => {
   // Just for woking part I'm throwing JSON error
   if (errors.length > 0) {
     return res.render("pages/signUp", {
+      authenticated: false,
       title: "Error SignUp",
       errors: errors,
       dataSignIn: dataSignIn,
@@ -236,16 +250,14 @@ router.post("/signup", async (req, res) => {
     allUsers.find((user) => {
       if (user.emailId === email.toLowerCase()) {
         emailUsed = true;
-        console.log("adsas");
+
         return emailUsed;
       } else {
-        console.log("nnnn");
         emailUsed = false;
         return emailUsed;
       }
     });
 
-    console.log(emailUsed);
     if (emailUsed == false) {
       const newUser = await usersData.addUser(
         firstName,
@@ -255,32 +267,38 @@ router.post("/signup", async (req, res) => {
         password,
         address
       );
-      console.log(newUser);
+
       // req.seesion.user = newUser;
       //Just for now redirecting to the root route
       // res.redirect("/");
-
+      req.session.user = newUser;
       return res.render("pages/loginPage", {
+        authenticated: true,
         title: "signIn Done",
       });
     } else {
       return res.render("pages/signUp", {
+        authenticated: false,
         title: "error",
         error: "Email is already used",
       });
     }
   } catch (error) {
-    console.log(error);
-    return res.json({ message: " error from addUser()" });
+    errors.push(error);
+    return res.render("pages/signUp", {
+      title: "error",
+      authenticated: false,
+      errors: errors,
+    });
   }
 });
 
 router.get("/:id", async (req, res) => {
   try {
     const userInfo = await usersData.getUser(req.params.id);
-    res.json(userInfo);
+    return res.json(userInfo);
   } catch (error) {
-    res.status().json({ message: "No Data (/:id)" });
+    return res.status().json({ message: "No Data (/:id)" });
   }
 });
 
