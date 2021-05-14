@@ -71,19 +71,24 @@ $(document).ready(function () {
       type: "POST", // type of action POST || GET
       dataType: "json", // data type
       data: body, // post data || get data
-      success: function (data) {
-        $("#error_msg").empty();
-        $("#exampleModalLong").hide();
-        $("#prod_modal_dialog").hide();
-        location.reload();
-        console.log("rfed");
-      },
-      error: function () {
-        $("#error_msg").empty();
-        $("#error_msg").append(
-          "<p>Error! Please enter a valid data to add the product.</p>"
-        );
-        console.log("rfd");
+
+      complete: function (e) {
+        if (e.status == 200) {
+          $("#error_msg").empty();
+          $("#exampleModalLong").hide();
+          $("#prod_modal_dialog").hide();
+          location.reload();
+        } else if (e.status == 400) {
+          $("#error_msg").empty();
+          $("#error_msg").append(
+            `<p>Error! ${JSON.parse(e.responseText)["error"]}</p>`
+          );
+        } else {
+          $("#error_msg").empty();
+          $("#error_msg").append(
+            "<p>Error! Please enter a valid data to add the product.</p>"
+          );
+        }
       },
     });
   });

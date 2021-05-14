@@ -152,19 +152,6 @@ async function main() {
     25
   );
 
-  const product0 = await products.addProduct(
-    "plant 10",
-    "Plants from Indian Subcontinent",
-    "https://i.pinimg.com/originals/da/33/bf/da33bf18c254ea101672892c612679fb.jpg",
-    "seed.js",
-    20,
-    [
-      { property: "product_type", value: "plant" },
-      { property: "weight", value: 60 },
-    ],
-    34
-  );
-
   const product11 = await products.addProduct(
     "Indian Yellow Plants",
     "Plants from Indian Subcontinent",
@@ -190,7 +177,6 @@ async function main() {
     [
       { property: "product_type", value: "fertilizer" },
       { property: "suitable_weather", value: "sunny" },
-      { property: "weight", value: 60 },
       { property: "weight", value: "Medium sized" },
     ],
     33
@@ -204,7 +190,7 @@ async function main() {
     1,
     [
       { property: "product_type", value: "fertilizer" },
-      { property: "weight", value: 20 },
+      { property: "weight int", value: 20 },
       { property: "number of packets", value: 43 },
     ],
     3

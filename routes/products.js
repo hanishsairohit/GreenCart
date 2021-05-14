@@ -48,10 +48,16 @@ router.post("/product", async (req, res) => {
       price
     );
     res.json(newProduct);
-    res.status(200);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Product was not added" });
+    if (Array.isArray(error)) {
+      error = error[0];
+      res.status(400);
+      res.json({ error });
+    } else {
+      res.status(500);
+      res.json({ "Product was not added": "" });
+    }
   }
 });
 
@@ -242,7 +248,6 @@ router.get("/properties/:type", async (req, res) => {
         res.json(result);
         return;
       }
-      result.push(type.type);
     }
     res.status(200);
     res.json(result);
@@ -277,7 +282,6 @@ router.post("/filter", async (req, res) => {
   const filterProp = req.body;
   try {
     const productTypesList = await productType.getProductTypes();
-
     for (type of productTypesList) {
       if (type.type == filterProp["product_type"]) {
         for (prop of type.properties) {
@@ -286,6 +290,7 @@ router.post("/filter", async (req, res) => {
               filterProp[prop.name] = parseFloat(filterProp[prop.name]) + 1; //adding one to increase the limit of search
               if (isNaN(filterProp[prop.name])) {
                 delete filterProp[prop.name];
+                filterProp[prop.name] = Number.MIN_VALUE;
               }
             }
           }
@@ -293,8 +298,12 @@ router.post("/filter", async (req, res) => {
       }
     }
 
+    console.log(filterProp);
+
     errorHandler.checkFilterProperties(filterProp);
     const productList = await productsData.filterProducts(filterProp);
+
+    let hasProduct = false;
 
     if (productList.length > 0) {
       hasProduct = true;

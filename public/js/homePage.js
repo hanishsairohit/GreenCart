@@ -45,6 +45,7 @@ $(document).ready(function () {
   $(document).on("click", ".dropdown-item", function (e) {
     const product_type = $(this).val();
     filterDiv.empty();
+    property_types_list = [];
     $.ajax({
       url: `/properties/${product_type}`,
       type: "GET",
@@ -96,7 +97,6 @@ $(document).ready(function () {
     e.preventDefault();
     const filterData = $("#filterData").serializeArray();
 
-    console.log(filterData);
     const updatedData = [];
 
     for (i of filterData) {
@@ -104,6 +104,7 @@ $(document).ready(function () {
       if (i.value == "") {
         continue;
       }
+
       updatedData.push(i);
     }
 

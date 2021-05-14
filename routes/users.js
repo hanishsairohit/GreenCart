@@ -82,7 +82,6 @@ router.get("/details", async (req, res) => {
   }
 });
 
-
 router.get("/user/:id", async (req, res) => {
   try {
     const userInfo = await usersData.getUser(req.params.id);

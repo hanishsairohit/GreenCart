@@ -60,7 +60,7 @@ let exportedMethods = {
     errorHandler.checkStringObjectId(id, "Product ID");
     const productCollection = await products();
     const product = await productCollection.findOne({ _id: ObjectId(id) });
-    if (!product) throw "product not found";
+    if (!product) throw 4000;
     product._id = product._id.toString();
     return product;
   },
@@ -98,10 +98,59 @@ let exportedMethods = {
       price: price,
     };
 
+    for (attribute of facet) {
+      if (!isNaN(parseFloat(attribute.value))) {
+        attribute.value = parseFloat(attribute.value);
+      }
+    }
+
+    if (await productType.doesProductTypeExist(facet[0]["value"])) {
+      console.log(facet[0]["value"]);
+      const removedProp = facet[0];
+      let index = 0;
+      for (attribute of facet) {
+        if (index == 0) {
+          index = index + 1;
+          continue;
+        }
+
+        const newProp = {
+          name: attribute.property,
+          type: typeof attribute.value,
+          values: [attribute.value],
+        };
+
+        if (
+          await productType.doesPropertyOfProductTypeExist(
+            removedProp["value"],
+            newProp
+          )
+        ) {
+          const proptypes = await productType.getProductTypes();
+          for (productype of proptypes) {
+            if (productype.type == removedProp["value"]) {
+              for (prop of productype.properties) {
+                if (prop.name == newProp.name) {
+                  if (prop.type != newProp.type) {
+                    throw [
+                      `${newProp.name} property already exists and should be of type ${prop.type}`,
+                    ];
+                    // throwing array to  differentiate this error other errors.
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     const insertedInfo = await productCollection.insertOne(newProduct);
+    console.log(insertedInfo.insertedId, "ff");
     if (insertedInfo.insertedCount === 0) throw "Insert failed!";
 
     if (await productType.doesProductTypeExist(facet[0]["value"])) {
+      console.log(facet[0]["value"]);
       const removedProp = facet.shift();
       for (attribute of facet) {
         const newProp = {

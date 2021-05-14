@@ -174,7 +174,16 @@ module.exports = {
 
     const productsList = [];
     for (productID of user.LikeHistory) {
-      productsList.push(await products.getProductById(productID.toString()));
+      try {
+        productsList.push(await products.getProductById(productID.toString()));
+      } catch (error) {
+        if (error == 4000) {
+          continue;
+        } else {
+          console.log(error);
+          throw "fatel error in getUserLikedProducts function";
+        }
+      }
     }
     return productsList;
   },
@@ -229,7 +238,16 @@ module.exports = {
 
     const productsList = [];
     for (productID of user.viewHistory) {
-      productsList.push(await products.getProductById(productID.toString()));
+      try {
+        productsList.push(await products.getProductById(productID.toString()));
+      } catch (error) {
+        if (error == 4000) {
+          continue;
+        } else {
+          console.log(error);
+          throw "fatel error in getUserLikedProducts function";
+        }
+      }
     }
     return productsList;
   },
@@ -241,7 +259,16 @@ module.exports = {
 
     const productsList = [];
     for (productID of user.purchaseHistory) {
-      productsList.push(await products.getProductById(productID.toString()));
+      try {
+        productsList.push(await products.getProductById(productID.toString()));
+      } catch (error) {
+        if (error == 4000) {
+          continue;
+        } else {
+          console.log(error);
+          throw "fatel error in getUserLikedProducts function";
+        }
+      }
     }
     return productsList;
   },
