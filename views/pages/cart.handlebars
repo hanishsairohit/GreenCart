@@ -1,50 +1,47 @@
 <div Class="location">
-    <button type="button" class="btn btn-success">Home</button>
-    <button type="button" class="btn btn-warning">User</button>
+  <button type="button" class="btn btn-success">Home</button>
+  <button type="button" class="btn btn-warning">User</button>
 </div>
 
-<div class="container" id ="cart_container">
- <!--Section: Content-->
-    <section class="col-md-12" id="single_prod_section">
+<div class="container" id="cart_container">
+  <!--Section: Content-->
+  <section class="col-md-12" id="single_prod_section">
 
-        <!--Grid row-->
+    <!--Grid row-->
+    <div class="row">
+
+      <!--Grid column-->
+      <div class="col-md-8">
         <div class="row">
-
-            <!--Grid column-->
-            <div class="col-md-8">
-                <div class="row">
-                    <h3 class="single_h3">{{product.title}} : Water Plant</h3>
-                    <p class="">{{product.description}}</p>
-                    <p>Price : $50</p>
-                </div>
-                <div class="row" id ="user_details">
-                    <p>Customer Details:  </p>
-                    <h5 class="single_h3">   James Hills</h5>
-                    <p class="">Address: {{product.description}}</p>
-                    <p class="">Contact : ########</p>
-                     
-                </div>
-            </div>
-            <!--Grid column-->
-
-            <!--Grid column-->
-            <div class="col-md-4">
-                <!--Image-->
-                <div class="view overlay">
-                    <img src="{{product.productImage}}" class="img-fluid" alt="">
-                    <a href="#">
-                        <div class=""></div>
-                    </a>
-                </div>
-            </div>
-            <!--Grid column-->
+          <h3 class="single_h3">{{product.title}} : Water Plant</h3>
+          <p class="">{{product.description}}</p>
+          <p>Price : $50</p>
+        </div>
+        <div class="row" id="user_details">
+          <p>Customer Details: </p>
+          <h5 class="single_h3"> James Hills</h5>
+          <p class="">Address: {{product.description}}</p>
+          <p class="">Contact : ########</p>
 
         </div>
-        <!--Grid row-->
+      </div>
+      <!--Grid column-->
 
+      <!--Grid column-->
+      <div class="col-md-4">
+        <!--Image-->
+        <div class="view overlay">
+          <img src="{{product.productImage}}" class="img-fluid" alt="" />
+          <a href="#">
+            <div class=""></div>
+          </a>
+        </div>
+      </div>
+      <!--Grid column-->
 
-    </section>
-    <!--Section: Content-->
+    </div>
+    <!--Grid row-->
 
-
+  </section>
+  <!--Section: Content-->
 </div>

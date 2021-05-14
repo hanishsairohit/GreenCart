@@ -37,10 +37,10 @@ $(document).ready(function () {
     },
   });
 
-  $(document).on("click", "#search_submit", function (e) {
-    const searchTerm = $("#search_bar").val();
-    submit(`/search/${searchTerm}`, "GET", []);
-  });
+  // $(document).on("click", "#search_submit", function (e) {
+  //   const searchTerm = $("#search_bar").val();
+  //   submit(`/search/${searchTerm}`, "GET", []);
+  // });
 
   $(document).on("click", ".dropdown-item", function (e) {
     const product_type = $(this).val();
@@ -61,6 +61,11 @@ $(document).ready(function () {
             <input type = "number" id = "${prop.name}"name= "${prop.name}">
             </div>`;
           } else {
+            //wrote this code to remove bugs
+            if (prop.name === undefined) {
+              continue;
+            }
+
             formData =
               formData +
               `
@@ -88,25 +93,20 @@ $(document).ready(function () {
   });
 
   $(document).on("click", "#filterButton", function (e) {
+    e.preventDefault();
     const filterData = $("#filterData").serializeArray();
 
     console.log(filterData);
     const updatedData = [];
 
     for (i of filterData) {
+      console.log(i);
       if (i.value == "") {
         continue;
       }
       updatedData.push(i);
     }
-    console.log(updatedData);
-    submit("/filter", "POST", updatedData);
-  });
 
-  $(document).on("click", "#search_submit", function () {
-    console.log("frnm d");
-    const searchTerm = $("#search_bar").val();
-    console.log(searchTerm);
-    submit(`/search/${searchTerm}`, "GET", [{ name: "d", value: "csx" }]);
+    submit("/filter", "POST", updatedData);
   });
 });
