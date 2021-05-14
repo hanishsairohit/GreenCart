@@ -1,13 +1,13 @@
 const express = require("express");
-const { reset } = require("nodemon");
 const router = express.Router();
 const data = require("../data");
 const productsData = data.products;
 
 const commentsData = data.comments;
 const productType = data.productType;
-const usersData = data.users;
+
 const errorHandler = require("../Error/DatabaseErrorHandling");
+const { get, route } = require("./users");
 
 router.post("/product", async (req, res) => {
   const productInfo = req.body;
@@ -15,29 +15,17 @@ router.post("/product", async (req, res) => {
   productInfo["price"] = parseFloat(productInfo.price);
   productInfo["stock"] = parseInt(productInfo.stock);
 
-  // productInfo["facet"] = [
-  //   { property: "product_type", value: "plant" },
-  //   { property: "color", value: "green" },
-  // ];
-
-  for (i of productInfo.facet) {
-    if (!isNaN(parseFloat(i.value))) {
-      i.value = parseFloat(i.value);
-    }
-  }
-
   console.log(productInfo.productImage);
 
   console.log(productInfo);
   try {
-    if (isNaN(productInfo["stock"])) {
-      throw "Please enter a valid stock value";
-    }
-
     if (isNaN(productInfo["price"])) {
-      throw "Please enter a valid price";
+      throw "price is nan";
     }
 
+    if (isNaN(productInfo["stock"])) {
+      throw "Stock is nan";
+    }
     errorHandler.checkObject(productInfo, "Product form data");
     errorHandler.checkString(productInfo.title, "title");
     errorHandler.checkString(productInfo.description, "Description");
@@ -60,10 +48,16 @@ router.post("/product", async (req, res) => {
       price
     );
     res.json(newProduct);
-    res.status(200);
   } catch (error) {
     console.log(error);
-    res.sendStatus(404);
+    if (Array.isArray(error)) {
+      error = error[0];
+      res.status(400);
+      res.json({ error });
+    } else {
+      res.status(500);
+      res.json({ "Product was not added": "" });
+    }
   }
 });
 
@@ -97,34 +91,39 @@ router.get("/", async (req, res) => {
   }
 });
 
-// like
-router.patch("/product/like/:id", async (req, res) => {
-  try {
-    errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    await productsData.addLike(req.params.id, "6096ea6fb548d9936bc7c9bd");
-    res.sendStatus(200);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(404);
-  }
-});
-
 //to get product by Id provided
-
 router.get("/products/product/:id", async (req, res) => {
   try {
     // if (req.session.user) {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     let product = await productsData.getProductById(req.params.id);
-    console.log(product);
+    const productComments = await productsData.getProductComments(
+      req.params.id
+    );
+
+    const commentList = [];
+    for (comment of productComments) {
+      commentList.push(comment.commentText);
+    }
+
     await usersData.userViewsAProduct(
       "609a2fca59ef0ecfeb7b57af",
       req.params.id
     );
+
+    let hascomments = true;
+
+    if (commentList.length == 0) {
+      hascomments = false;
+    }
+
     res.render("pages/singleProduct", {
       title: product.title,
       product: product,
+      comments: commentList,
+      hascomments: hascomments,
     });
+
     // } else {
     //   res.sendStatus(404).json({ message: "User not Authenticated" });
     // }
@@ -133,20 +132,9 @@ router.get("/products/product/:id", async (req, res) => {
   }
 });
 
-//adding products into the database (admin access only)
-router.post("/", async (req, res) => {
-  const productInfo = req.body;
-  console.log(req.body);
-  if (!productInfo) {
-    res
-      .status(400)
-      .json({ error: "You must provide data to create a Product" });
-    return;
-  }
-});
-
 router.patch("/product/like/:id", async (req, res) => {
   try {
+    console.log("edsx");
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     if (req.session.user) {
       await productsData.addLike(req.params.id, req.session.user._id);
@@ -175,10 +163,10 @@ router.patch("/product/dislike/:id", async (req, res) => {
 });
 
 router.patch("/product/comment/:id", async (req, res) => {
-  const comment_text = req.body;
+  const comment_text = req.body.review;
   try {
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    errorHandler.checkString(req.body);
+    errorHandler.checkString(comment_text);
     if (req.session.user) {
       await commentsData.addComment(
         req.session.user._id,
@@ -195,52 +183,14 @@ router.patch("/product/comment/:id", async (req, res) => {
   }
 });
 
-router.get("/buy", async (req, res) => {
+router.patch("/addtocart/:id", async (req, res) => {
   try {
-    if (req.session.user) {
-      let unique = req.session.cartItems.filter(
-        (v, i, a) => a.indexOf(v) === i
-      );
-
-      for (i of unique) {
-        await usersData.userPurchasesAProduct(req.session.user._id, i);
-      }
-      req.session.cartItems = [];
-      res.sendStatus(200);
-    } else {
-      res.sendStatus(404);
-    }
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(404);
-  }
-});
-
-router.patch("/product/comment/:id", async (req, res) => {
-  try {
-    errorHandler.checkStringObjectId(req.params.id, "Product ID");
-    await commentsData.addComment(
-      "6096ea6fb548d9936bc7c9bd",
-      req.params.id,
-      "This product is so good"
-    );
-    res.sendStatus(200);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(404);
-  }
-});
-
-router.get("/addtocart/:id", async (req, res) => {
-  try {
-    console.log("rfdsx");
     errorHandler.checkStringObjectId(req.params.id, "Product ID");
     if (req.session.user) {
       console.log(req.session);
       req.session.cartItems.push(req.params.id);
       res.sendStatus(200);
     } else {
-      console.log("fdscxz");
       res.sendStatus(404);
     }
   } catch (error) {
@@ -256,7 +206,6 @@ router.get("/cart/", async (req, res) => {
       let unique = req.session.cartItems.filter(
         (v, i, a) => a.indexOf(v) === i
       );
-
       for (i of unique) {
         productsList.push(await productsData.getProductById(i));
       }
@@ -300,7 +249,8 @@ router.get("/properties/:type", async (req, res) => {
         return;
       }
     }
-    res.sendStatus(404);
+    res.status(200);
+    res.json(result);
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
@@ -331,8 +281,29 @@ router.post("/search", async (req, res) => {
 router.post("/filter", async (req, res) => {
   const filterProp = req.body;
   try {
+    const productTypesList = await productType.getProductTypes();
+    for (type of productTypesList) {
+      if (type.type == filterProp["product_type"]) {
+        for (prop of type.properties) {
+          if (prop.type == "number") {
+            if (filterProp[prop.name]) {
+              filterProp[prop.name] = parseFloat(filterProp[prop.name]) + 1; //adding one to increase the limit of search
+              if (isNaN(filterProp[prop.name])) {
+                delete filterProp[prop.name];
+                filterProp[prop.name] = Number.MIN_VALUE;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    console.log(filterProp);
+
     errorHandler.checkFilterProperties(filterProp);
     const productList = await productsData.filterProducts(filterProp);
+
+    let hasProduct = false;
 
     if (productList.length > 0) {
       hasProduct = true;
@@ -343,6 +314,26 @@ router.post("/filter", async (req, res) => {
       productList: productList,
       hasProduct: hasProduct,
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ message: error });
+  }
+});
+
+router.get("/getUserLikedProducts/", async (req, res) => {
+  try {
+    if (req.session.user) {
+      errorHandler.checkStringObjectId(req.session.user._id);
+      let likedProducts = await usersData.getUserLikedProducts(
+        req.session.user._id
+      );
+
+      likedProducts = likedProducts.filter((v, i, a) => a.indexOf(v) === i);
+
+      res.json(likedProducts);
+    } else {
+      res.status(400).json({ message: "not found" });
+    }
   } catch (error) {
     console.log(error);
     return res.status(400).json({ message: error });
