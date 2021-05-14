@@ -233,18 +233,18 @@ router.post("/signup", async (req, res) => {
     ZipCode: parseInt(ZipCode),
     Country: "USA",
   };
-
-  dataError.checkAddress(address);
-  // Just for woking part I'm throwing JSON error
-  if (errors.length > 0) {
-    return res.render("pages/signUp", {
-      authenticated: false,
-      title: "Error SignUp",
-      errors: errors,
-      dataSignIn: dataSignIn,
-    });
-  }
   try {
+    dataError.checkAddress(address);
+    // Just for woking part I'm throwing JSON error
+    if (errors.length > 0) {
+      return res.render("pages/signUp", {
+        authenticated: false,
+        title: "Error SignUp",
+        errors: errors,
+        dataSignIn: dataSignIn,
+      });
+    }
+
     const allUsers = await usersData.getAllUsers();
     let emailUsed;
     allUsers.find((user) => {
@@ -286,7 +286,7 @@ router.post("/signup", async (req, res) => {
   } catch (error) {
     errors.push(error);
     return res.render("pages/signUp", {
-      title: "error",
+      title: errors[0],
       authenticated: false,
       errors: errors,
     });
