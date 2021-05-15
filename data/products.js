@@ -287,7 +287,7 @@ let exportedMethods = {
     const product = await this.getProductById(productID);
 
     if (product.stock == 1) {
-      this.deleteProduct(product);
+      this.deleteProduct(product._id);
     } else {
       const updatedInfo = await productsCollection.updateOne(
         {
@@ -331,12 +331,10 @@ let exportedMethods = {
     errorHandler.checkStringObjectId(productID, "Product ID");
     errorHandler.checkInt(stock, "stock");
     const productType = require("./index").productType;
-
     const productsCollection = await products();
     const product = await this.getProductById(productID);
-
     const deletedInfo = await productsCollection.deleteOne({
-      _id: ObjectId(product._id),
+      _id: ObjectId(productID),
     });
     if (deletedInfo.deletedCount === 0) throw "failed to delete a product";
 

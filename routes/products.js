@@ -10,8 +10,9 @@ const errorHandler = require("../Error/DatabaseErrorHandling");
 const { get, route } = require("./users");
 
 router.post("/product", async (req, res) => {
-  const productInfo = req.body;
-
+  const productInfo = xss(req.body);
+  console.log(productInfo);
+  console.log("Fd");
   productInfo["price"] = parseFloat(productInfo.price);
   productInfo["stock"] = parseInt(productInfo.stock);
 
